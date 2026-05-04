@@ -531,4 +531,51 @@ def process_single_case(case_info: Dict) -> Optional[Dict]:
         logger.error(f"Error processing {case_info['case_name']}: {e}")
         return None
 
+# ============================================================
+# STEP 10: SUMMARY REPORT
+# ============================================================
+
+def generate_summary_report(df: pd.DataFrame):
+    report_lines = []
+    report_lines.append("=" * 80)
+    report_lines.append("LEGAL NLP ETL PIPELINE - SUMMARY REPORT")
+    report_lines.append("=" * 80)
+    report_lines.append(f"\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    report_lines.append(f"Total Cases: {len(df)}")
+    
+    if 'Source_Folder' in df.columns:
+        report_lines.append("\n📁 SOURCE DISTRIBUTION:")
+        for source, count in df['Source_Folder'].value_counts().items():
+            report_lines.append(f"  - {source}: {count} cases")
+    
+    report_lines.append("\n📚 CASE TYPE DISTRIBUTION:")
+    for ct, count in df['Case_Type'].value_counts().head(10).items():
+        report_lines.append(f"  - {ct}: {count} ({count/len(df)*100:.1f}%)")
+    
+    report_lines.append("\n🔍 SUB-TYPE DISTRIBUTION (FIXED - Now includes Larceny, etc.):")
+    for st, count in df['Sub_Type'].value_counts().head(15).items():
+        report_lines.append(f"  - {st}: {count} ({count/len(df)*100:.1f}%)")
+    
+    report_lines.append("\n⚖️ VERDICT DISTRIBUTION:")
+    for v, count in df['Verdict'].value_counts().head(10).items():
+        report_lines.append(f"  - {v}: {count} ({count/len(df)*100:.1f}%)")
+    
+    if 'Year' in df.columns:
+        years = pd.to_numeric(df['Year'], errors='coerce')
+        report_lines.append(f"\n📅 YEAR RANGE: {years.min():.0f} - {years.max():.0f}")
+    
+    if 'Num_Citations' in df.columns:
+        report_lines.append(f"\n📊 CITATIONS: Total {df['Num_Citations'].sum()}, Avg {df['Num_Citations'].mean():.2f} per case")
+    
+    report_lines.append(f"\n✅ QUALITY METRICS:")
+    report_lines.append(f"  - Known verdicts: {(df['Verdict'] != 'Verdict Unknown').sum()}/{len(df)} ({(df['Verdict'] != 'Verdict Unknown').sum()/len(df)*100:.1f}%)")
+    report_lines.append(f"  - Classified cases: {(df['Case_Type'] != 'Unclassified').sum()}/{len(df)} ({(df['Case_Type'] != 'Unclassified').sum()/len(df)*100:.1f}%)")
+    report_lines.append(f"  - Cases with specific sub-types: {(df['Sub_Type'] != 'General').sum()}/{len(df)} ({(df['Sub_Type'] != 'General').sum()/len(df)*100:.1f}%)")
+    
+    report_path = os.path.join(OUTPUT_DIR, 'etl_summary_report.txt')
+    with open(report_path, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(report_lines))
+    
+    print('\n' + '\n'.join(report_lines))
+    logger.info(f"Report saved: {report_path}")
 
