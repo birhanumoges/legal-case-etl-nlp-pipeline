@@ -251,4 +251,63 @@ def extract_verdict(text: str) -> str:
             if callable(result):
                 return result(match)
             return result
+
+# ============================================================
+# STEP 5: CASE TYPE CLASSIFICATION (IMPROVED)
+# ============================================================
+
+def extract_case_type(text: str) -> str:
+    """Classify case type using weighted keyword matching"""
+    t = text.lower()
     
+    type_keywords = {
+        "Criminal Law": {
+            'keywords': ['indictment', 'larceny', 'murder', 'felony', 'misdemeanor', 'guilty', 
+                        'theft', 'robbery', 'burglary', 'homicide', 'manslaughter', 'assault',
+                        'battery', 'crime', 'criminal', 'state', 'prosecution', 'grand jury'],
+            'weight': 3
+        },
+        "Civil Procedure": {
+            'keywords': ['demurrer', 'plea', 'pleading', 'writ', 'jurisdiction', 'venue', 
+                        'continuance', 'appeal', 'error', 'scire facias', 'replevin', 'assumpsit',
+                        'verification', 'replication', 'joinder', 'nul tiel record'],
+            'weight': 2
+        },
+        "Contract Law - Debt": {
+            'keywords': ['debt', 'bond', 'promissory note', 'covenant', 'contract', 'payment', 
+                        'interest', 'usury', 'consideration', 'obligation', 'surety', 'bail'],
+            'weight': 2
+        },
+        "Property Law - Ejectment": {
+            'keywords': ['ejectment', 'possession', 'land', 'real estate', 'title', 'deed', 
+                        'conveyance', 'mortgage', 'foreclosure', 'equity of redemption', 'tenement'],
+            'weight': 2
+        },
+        "Property Law - Execution Sale": {
+            'keywords': ['execution', 'sheriff', 'sale', 'levy', 'fi. fa.', 'ca. sa.', 
+                        'fieri facias', 'capias', 'venditioni exponas', 'goods'],
+            'weight': 2
+        },
+        "Family Law - Dower": {
+            'keywords': ['dower', 'dowable', 'widow', 'marriage', 'coverture', 'cestui que trust', 
+                        'heir', 'inheritance', 'dower rights'],
+            'weight': 2
+        },
+        "Torts": {
+            'keywords': ['trespass', 'negligence', 'damages', 'assault', 'battery', 'slander', 
+                        'libel', 'injury', 'conversion', 'nuisance'],
+            'weight': 2
+        },
+    }
+    
+    scores = defaultdict(int)
+    for case_type, info in type_keywords.items():
+        for keyword in info['keywords']:
+            if keyword in t:
+                scores[case_type] += info['weight']
+    
+    if scores:
+        return max(scores, key=scores.get)
+    return "Unclassified"
+
+
