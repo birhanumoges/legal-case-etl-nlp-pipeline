@@ -485,4 +485,50 @@ def extract_case_name(json_metadata: Dict, text: str, case_name_from_file: str) 
         return f"{match.group(1)} v. {match.group(2)}"
     return case_name_from_file
 
+# ============================================================
+# STEP 9: SINGLE CASE PROCESSING
+# ============================================================
+
+def process_single_case(case_info: Dict) -> Optional[Dict]:
+    try:
+        case_text, text_length = extract_text_from_html(case_info['html_file'])
+        if not case_text:
+            return None
+        
+        json_metadata = extract_metadata_from_json(case_info['json_file'])
+        
+        verdict = extract_verdict(case_text)
+        case_type = extract_case_type(case_text)
+        sub_type = extract_sub_type(case_text, case_type)  # FIXED: Now uses improved function
+        citations = extract_citations(case_text, json_metadata)
+        year = extract_year(case_text, json_metadata)
+        court = extract_court(json_metadata, case_text)
+        case_name = extract_case_name(json_metadata, case_text, case_info['case_name'])
+        
+        return {
+            'Case_ID': case_info['case_id'],
+            'Case_Name': case_info['case_name'],
+            #'Case_Name': case_name,
+            'Source_Folder': case_info['source'],
+            'Year': year,
+            'Court': court,
+            'Case_Text': case_text[:10000],
+            'Case_Text_Full_Length': text_length,
+            'Verdict': verdict,
+            'Case_Type': case_type,
+            'Sub_Type': sub_type,
+            'Num_Citations': len(citations),
+            'Legal_Citations': '; '.join(citations[:20]),
+            'Has_Metadata': case_info['metadata'] is not None,
+            'HTML_File': str(case_info['html_file']),
+            'JSON_File': str(case_info['json_file']),
+            'Decision_Date': json_metadata.get('decision_date', ''),
+            'Docket_Number': json_metadata.get('docket_number', ''),
+            'First_Page': json_metadata.get('first_page', ''),
+            'Last_Page': json_metadata.get('last_page', ''),
+        }
+    except Exception as e:
+        logger.error(f"Error processing {case_info['case_name']}: {e}")
+        return None
+
 
