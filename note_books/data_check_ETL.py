@@ -199,3 +199,56 @@ def extract_metadata_from_json(json_file: Path) -> Dict:
     except Exception as e:
         logger.error(f"Error extracting metadata from {json_file}: {e}")
         return {}
+
+# ============================================================
+# STEP 4: VERDICT EXTRACTION (IMPROVED)
+# ============================================================
+
+def extract_verdict(text: str) -> str:
+    """
+    Enhanced verdict extraction for legal cases.
+    Handles multiple verdict locations and formats.
+    """
+    if not text:
+        return "Verdict Unknown"
+    
+    text_lower = text.lower()
+    
+    # ============================================================
+    # METHOD 1: Look for explicit judgment statements (anywhere)
+    # ============================================================
+    
+    # Priority patterns (highest confidence)
+    priority_patterns = [
+        # Per Curiam (most authoritative)
+        (r'per curiam[^.]*\.\s*(?:the\s+)?(?:judgment|decree|order|verdict)\s+is\s+(reversed|affirmed|remanded)', 
+         lambda m: f"Per Curiam: Judgment {m.group(1).upper()}"),
+        (r'per curiam[^.]*\.\s*the\s+arrest\s+of\s+judgment\s+is\s+(reversed|affirmed)', 
+         lambda m: f"Per Curiam: Arrest of Judgment {m.group(1).upper()}"),
+        (r'per curiam[^.]*\.\s*the\s+(?:judgment|decree)\s+is\s+reversed', 
+         "Per Curiam: Judgment REVERSED"),
+        (r'per curiam[^.]*\.\s*the\s+(?:judgment|decree)\s+is\s+affirmed', 
+         "Per Curiam: Judgment AFFIRMED"),
+        
+        # Direct judgment statements
+        (r'(?:the\s+)?judgment\s+of\s+the\s+court\s+below\s+is\s+(reversed|affirmed|remanded)', 
+         lambda m: f"Judgment {m.group(1).upper()}"),
+        (r'(?:the\s+)?(?:judgment|decree)\s+is\s+(reversed|affirmed|remanded)\s+(?:with\s+costs)?',
+         lambda m: f"Judgment {m.group(1).upper()}"),
+        (r'(?:the\s+)?(?:judgment|decree)\s+is\s+(affirmed|reversed)', 
+         lambda m: f"Judgment {m.group(1).upper()}"),
+        
+        # Compound judgments (partial affirmance/reversal)
+        (r'judgment\s+as\s+to\s+the\s+debt[^.]*is\s+affirmed[^.]*as\s+to\s+the\s+damages\s+reversed',
+         "Judgment AFFIRMED in part, REVERSED in part"),
+        (r'judgment\s+(?:as\s+to\s+[^,]+)?\s*affirmed[^.]*reversed', 
+         "Judgment AFFIRMED in part, REVERSED in part"),
+    ]
+    
+    for pattern, result in priority_patterns:
+        match = re.search(pattern, text_lower)
+        if match:
+            if callable(result):
+                return result(match)
+            return result
+    
