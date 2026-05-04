@@ -310,4 +310,116 @@ def extract_case_type(text: str) -> str:
         return max(scores, key=scores.get)
     return "Unclassified"
 
+# ============================================================
+# STEP 6: SUB-TYPE EXTRACTION (FIXED - NOW HANDLES CRIMINAL CASES)
+# ============================================================
+
+def extract_sub_type(text: str, case_type: str) -> str:
+    """Extract fine-grained sub-type with improved criminal law detection"""
+    t = text.lower()
+    
+    # Criminal Law sub-types (FIXED - Now properly detects Larceny, etc.)
+    if case_type == "Criminal Law":
+        if any(kw in t for kw in ['larceny', 'steal', 'stolen', 'theft', 'petit larceny', 'grand larceny']):
+            return "Larceny"
+        if any(kw in t for kw in ['murder', 'homicide', 'kill', 'manslaughter', 'slay']):
+            return "Homicide"
+        if any(kw in t for kw in ['assault', 'battery', 'assault and battery']):
+            return "Assault & Battery"
+        if any(kw in t for kw in ['burglary', 'robbery', 'break']):
+            return "Burglary/Robbery"
+        if any(kw in t for kw in ['indictment', 'grand jury']):
+            return "Indictment"
+        return "General Criminal"
+    
+    # Civil Procedure sub-types
+    if case_type == "Civil Procedure":
+        if any(kw in t for kw in ['demurrer', 'demur']):
+            return "Demurrer"
+        if any(kw in t for kw in ['appeal', 'writ of error', 'error']):
+            return "Appeal"
+        if any(kw in t for kw in ['default', 'defaulted', 'nil dicit']):
+            return "Default Judgment"
+        if any(kw in t for kw in ['plea', 'pleading', 'replication', 'rejoinder']):
+            return "Pleading"
+        if any(kw in t for kw in ['writ', 'scire facias', 'certiorari', 'mandamus']):
+            return "Writ"
+        if any(kw in t for kw in ['continuance', 'adjournment']):
+            return "Continuance"
+        if any(kw in t for kw in ['habeas corpus']):
+            return "Habeas Corpus"
+        return "General Civil Procedure"
+    
+    # Contract Law sub-types
+    if case_type == "Contract Law - Debt":
+        if any(kw in t for kw in ['promissory note', 'note', 'negotiable instrument']):
+            return "Promissory Note"
+        if any(kw in t for kw in ['bond', 'obligation', 'specialty']):
+            return "Bond"
+        if any(kw in t for kw in ['debt', 'indebtedness', 'recovery']):
+            return "Debt Collection"
+        if any(kw in t for kw in ['usury', 'usurious']):
+            return "Usury"
+        if any(kw in t for kw in ['breach', 'non-performance']):
+            return "Breach of Contract"
+        return "General Contract"
+    
+    # Property Law - Ejectment sub-types
+    if case_type == "Property Law - Ejectment":
+        if any(kw in t for kw in ['ejectment', 'recovery of land', 'possession']):
+            return "Ejectment"
+        if any(kw in t for kw in ['foreclosure', 'mortgage', 'equity of redemption']):
+            return "Mortgage Foreclosure"
+        if any(kw in t for kw in ['title', 'quiet title', 'cloud on title']):
+            return "Title Dispute"
+        if any(kw in t for kw in ['adverse possession', 'disseisin']):
+            return "Adverse Possession"
+        return "General Property"
+    
+    # Property Law - Execution Sale sub-types
+    if case_type == "Property Law - Execution Sale":
+        if any(kw in t for kw in ['sheriff sale', 'execution sale']):
+            return "Sheriff Sale"
+        if any(kw in t for kw in ['fi. fa.', 'fieri facias']):
+            return "Fieri Facias"
+        if any(kw in t for kw in ['ca. sa.', 'capias']):
+            return "Capias"
+        return "General Execution"
+    
+    # Family Law - Dower sub-types
+    if case_type == "Family Law - Dower":
+        if any(kw in t for kw in ['dower', 'dowable', 'dower rights']):
+            return "Dower Rights"
+        if any(kw in t for kw in ['heir', 'inheritance', 'devise', 'legatee']):
+            return "Inheritance"
+        return "General Family Law"
+    
+    # Torts sub-types
+    if case_type == "Torts":
+        if any(kw in t for kw in ['slander', 'defamation', 'libel']):
+            return "Defamation"
+        if any(kw in t for kw in ['trespass']):
+            return "Trespass"
+        if any(kw in t for kw in ['assault', 'battery']):
+            return "Assault & Battery"
+        if any(kw in t for kw in ['negligence']):
+            return "Negligence"
+        return "General Torts"
+    
+    # Fallback for Unclassified
+    general = {
+        "Foreclosure": ['foreclosure'],
+        "Appeal": ['appeal', 'writ of error'],
+        "Demurrer": ['demurrer', 'demur'],
+        "Default": ['default', 'default judgment'],
+        "Larceny": ['larceny', 'steal', 'theft'],
+        "Homicide": ['murder', 'homicide', 'kill']
+    }
+    
+    for sub_type, keywords in general.items():
+        if any(kw in t for kw in keywords):
+            return sub_type
+    
+    return "General"
+
 
