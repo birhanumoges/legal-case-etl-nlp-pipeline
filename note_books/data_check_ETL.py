@@ -1,1 +1,131 @@
+"""
+COMPLETE ETL PIPELINE FOR LEGAL NLP - FIXED VERSION
+Processes nested folder structure: allcase/file1/html/*.html + json/*.json + metadata/all_metadata.json
+Outputs: CSV, JSON, Parquet with columns: Case_ID, Year, Court, Case_Text, Verdict, Legal_Citations, Case_Type, Sub_Type
+FIX: Improved Sub-Type extraction for Criminal Law cases (Larceny, Homicide, Assault, etc.)
+"""
+
+import os
+import json
+import re
+import pandas as pd
+import numpy as np
+from pathlib import Path
+from bs4 import BeautifulSoup
+from typing import Dict, List, Optional, Tuple
+from datetime import datetime
+import logging
+from collections import defaultdict
+
+# ============================================================
+# CONFIGURATION
+# ============================================================
+
+ROOT_PATH = "C:/Users/DELL/Downloads/Legal Case"  # CHANGE THIS TO YOUR PATH
+OUTPUT_DIR = "C:/Users/DELL/Downloads/Legal Case/processed_data"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+REQUIRED_COLUMNS = ['Case_ID', 'Year', 'Court', 'Case_Text', 'Verdict', 'Legal_Citations', 'Case_Type', 'Sub_Type']
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger(__name__)
+
+
+# ============================================================
+# STEP 1: FILE DISCOVERY AND MATCHING
+# ============================================================
+
+def discover_and_match_files(root_path: str) -> Dict:
+    """Discover all HTML and JSON files and match them by base name"""
+    structure = {}
+    
+    for source_folder in os.listdir(root_path):
+        source_path = Path(root_path) / source_folder
+        
+        if not source_path.is_dir() or source_folder.startswith('.') or source_folder == "processed_data":
+            continue
+        
+        logger.info(f"\n📁 Scanning source: {source_folder}")
+        
+        html_folder = source_path / "html"
+        json_folder = source_path / "json"
+        metadata_file = source_path / "metadata" / "all_metadata.json"
+        
+        if not html_folder.exists():
+            logger.warning(f"  ⚠️ html folder not found in {source_folder}")
+            continue
+        if not json_folder.exists():
+            logger.warning(f"  ⚠️ json folder not found in {source_folder}")
+            continue
+        
+        html_files = list(html_folder.glob("*.html"))
+        json_files = list(json_folder.glob("*.json"))
+        
+        logger.info(f"  Found {len(html_files)} HTML files, {len(json_files)} JSON files")
+        
+        # Match by base name (without extension)
+        html_map = {f.stem: f for f in html_files}
+        json_map = {f.stem: f for f in json_files}
+        common_names = set(html_map.keys()) & set(json_map.keys())
+        
+        # Load master metadata
+        master_metadata = {}
+        if metadata_file.exists():
+            try:
+                with open(metadata_file, 'r', encoding='utf-8') as f:
+                    metadata_list = json.load(f)
+                    for meta in metadata_list:
+                        case_id = str(meta.get('id', ''))
+                        case_name = meta.get('name', '')
+                        if case_id:
+                            master_metadata[case_id] = meta
+                        if case_name:
+                            master_metadata[case_name] = meta
+                logger.info(f"  Loaded {len(master_metadata)} metadata entries")
+            except Exception as e:
+                logger.warning(f"  Could not load metadata: {e}")
+        
+        # Create case entries
+        cases = []
+        for name in common_names:
+            case_id_match = re.search(r'(\d{4})', name)
+            case_id = case_id_match.group(1) if case_id_match else name
+            
+            case_metadata = None
+            for key in [case_id, name, case_id_match.group(0) if case_id_match else None]:
+                if key and key in master_metadata:
+                    case_metadata = master_metadata[key]
+                    break
+            
+            cases.append({
+                'source': source_folder,
+                'case_name': name,
+                'case_id': case_id,
+                'html_file': html_map[name],
+                'json_file': json_map[name],
+                'metadata': case_metadata
+            })
+        
+        structure[source_folder] = {
+            'path': source_path,
+            'cases': cases,
+            'total_cases': len(cases)
+        }
+        
+        logger.info(f"  ✅ Matched {len(cases)} cases")
+        
+        unmatched_html = set(html_map.keys()) - common_names
+        unmatched_json = set(json_map.keys()) - common_names
+        if unmatched_html:
+            logger.warning(f"  ⚠️ Unmatched HTML: {list(unmatched_html)[:3]}...")
+        if unmatched_json:
+            logger.warning(f"  ⚠️ Unmatched JSON: {list(unmatched_json)[:3]}...")
+    
+    return structure
+
 
