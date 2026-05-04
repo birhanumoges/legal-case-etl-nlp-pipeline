@@ -128,4 +128,74 @@ def discover_and_match_files(root_path: str) -> Dict:
     
     return structure
 
+# ============================================================
+# STEP 2: TEXT EXTRACTION
+# ============================================================
 
+def extract_text_from_html(html_file: Path) -> Tuple[str, int]:
+    """Extract and clean text from HTML file"""
+    try:
+        with open(html_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        try:
+            soup = BeautifulSoup(content, 'html.parser')
+            for element in soup(["script", "style", "nav", "footer", "header"]):
+                element.decompose()
+            text = soup.get_text(separator=' ')
+        except:
+            text = content
+        
+        original_length = len(text)
+        
+        # Clean text
+        text = re.sub(r'\*\d+', '', text)           # Remove page markers
+        text = re.sub(r'\s+', ' ', text)             # Normalize whitespace
+        text = re.sub(r'\n\s*\n', '\n\n', text)      # Normalize paragraphs
+        text = text.strip()
+        
+        return text, original_length
+    except Exception as e:
+        logger.error(f"Error extracting text from {html_file}: {e}")
+        return "", 0
+
+# ============================================================
+# STEP 3: JSON METADATA EXTRACTION
+# ============================================================
+
+def extract_metadata_from_json(json_file: Path) -> Dict:
+    """Extract metadata from JSON file"""
+    try:
+        with open(json_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        metadata = {
+            'case_name': data.get('name', ''),
+            'decision_date': data.get('decision_date', ''),
+            'docket_number': data.get('docket_number', ''),
+            'first_page': data.get('first_page', ''),
+            'last_page': data.get('last_page', ''),
+            'court_name': '',
+            'citations': []
+        }
+        
+        if 'court' in data:
+            court = data['court']
+            metadata['court_name'] = court.get('name', '') if isinstance(court, dict) else str(court)
+        
+        if 'citations' in data:
+            for cite in data['citations']:
+                if isinstance(cite, dict) and 'cite' in cite:
+                    metadata['citations'].append(cite['cite'])
+        
+        if 'cites_to' in data:
+            for cite in data['cites_to']:
+                if isinstance(cite, dict) and 'cite' in cite:
+                    metadata['citations'].append(cite['cite'])
+                elif isinstance(cite, str):
+                    metadata['citations'].append(cite)
+        
+        return metadata
+    except Exception as e:
+        logger.error(f"Error extracting metadata from {json_file}: {e}")
+        return {}
