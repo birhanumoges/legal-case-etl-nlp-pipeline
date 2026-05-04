@@ -422,4 +422,67 @@ def extract_sub_type(text: str, case_type: str) -> str:
     
     return "General"
 
+# ============================================================
+# STEP 7: CITATION EXTRACTION
+# ============================================================
+
+def extract_citations(text: str, json_metadata: Dict) -> List[str]:
+    """Extract legal citations"""
+    citations = set()
+    
+    patterns = [
+        r'(\d+)\s+([A-Z][a-z]+\.?)\s+(\d+)',
+        r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+v\.\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?),\s+(\d+)\s+([A-Za-z\.]+)\s+(\d+)',
+        r'(\d+)\s+([A-Z][a-z]+\.?\s+[A-Z]?\.?)\s+(\d+)',
+        r'(\d+)\s+U\.S\.\s+(\d+)',
+        r'(\d+)\s+Blackf\.\s+(\d+)',
+        r'(\d+)\s+Binn\.\s+(\d+)',
+    ]
+    
+    for pattern in patterns:
+        matches = re.findall(pattern, text)
+        for match in matches:
+            if len(match) == 3:
+                citations.add(f"{match[0]} {match[1]} {match[2]}")
+            elif len(match) == 5:
+                citations.add(f"{match[0]} v. {match[1]}, {match[2]} {match[3]} {match[4]}")
+            elif len(match) == 2:
+                citations.add(f"{match[0]} U.S. {match[1]}")
+    
+    if json_metadata and 'citations' in json_metadata:
+        for cite in json_metadata['citations']:
+            if cite:
+                citations.add(cite)
+    
+    return sorted(list(citations))
+
+
+# ============================================================
+# STEP 8: YEAR & COURT EXTRACTION
+# ============================================================
+
+def extract_year(text: str, json_metadata: Dict) -> str:
+    if json_metadata and 'decision_date' in json_metadata:
+        year_match = re.search(r'(\d{4})', str(json_metadata['decision_date']))
+        if year_match:
+            return year_match.group(1)
+    year_match = re.search(r'\b(18|19|20)\d{2}\b', text)
+    return year_match.group(0) if year_match else "Unknown"
+
+def extract_court(json_metadata: Dict, text: str) -> str:
+    if json_metadata and json_metadata.get('court_name'):
+        return json_metadata['court_name']
+    match = re.search(r'Supreme Court of ([A-Za-z]+)', text)
+    if match:
+        return f"Supreme Court of {match.group(1)}"
+    return "Supreme Court of Indiana"
+
+def extract_case_name(json_metadata: Dict, text: str, case_name_from_file: str) -> str:
+    if json_metadata and json_metadata.get('case_name'):
+        return json_metadata['case_name']
+    match = re.search(r'^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?(?:\s+and\s+[A-Z][a-z]+)?)\s+v\.\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', text[:500])
+    if match:
+        return f"{match.group(1)} v. {match.group(2)}"
+    return case_name_from_file
+
 
