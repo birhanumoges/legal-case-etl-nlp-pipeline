@@ -787,3 +787,69 @@ def generate_summary_report(df: pd.DataFrame):
     print('\n' + '\n'.join(report_lines))
     logger.info(f"Report saved: {report_path}")
 
+# ============================================================
+# STEP 11: MAIN PIPELINE
+# ============================================================
+
+def run_etl_pipeline():
+    logger.info("=" * 70)
+    logger.info("LEGAL NLP ETL PIPELINE - STARTING (FIXED VERSION)")
+    logger.info("=" * 70)
+    
+    # Step 1: Discover files
+    logger.info("\n📁 Step 1: Discovering and matching files...")
+    structure = discover_and_match_files(ROOT_PATH)
+    
+    if not structure:
+        logger.error("❌ No valid sources found!")
+        logger.info("\nExpected structure: allcase/folder_name/html/*.html + json/*.json + metadata/all_metadata.json")
+        return pd.DataFrame()
+    
+    total_cases = sum(s['total_cases'] for s in structure.values())
+    logger.info(f"\n📊 Found {total_cases} total cases across {len(structure)} sources")
+    
+    # Step 2: Process cases
+    logger.info("\n⚙️ Step 2: Processing cases...")
+    all_results = []
+    
+    for source_name, source_info in structure.items():
+        logger.info(f"\n📂 Source: {source_name} ({source_info['total_cases']} cases)")
+        for idx, case_info in enumerate(source_info['cases'], 1):
+            logger.info(f"  [{idx}/{source_info['total_cases']}] {case_info['case_name']}")
+            result = process_single_case(case_info)
+            if result:
+                all_results.append(result)
+    
+    # Step 3: Create DataFrame
+    logger.info("\n📊 Step 3: Creating DataFrame...")
+    df = pd.DataFrame(all_results)
+    
+    if df.empty:
+        logger.error("❌ No cases processed!")
+        return df
+    
+    # Step 4: Validate columns
+    missing = [col for col in REQUIRED_COLUMNS if col not in df.columns]
+    if missing:
+        logger.warning(f"Missing columns: {missing}")
+    else:
+        logger.info("✅ All required columns present")
+    
+    # Step 5: Save outputs
+    logger.info("\n💾 Step 5: Saving outputs...")
+    
+    csv_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete.csv')
+    df.to_csv(csv_path, index=False, encoding='utf-8')
+    logger.info(f"  ✅ CSV: {csv_path}")
+    
+    json_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete.json')
+    df.to_json(json_path, orient='records', indent=2, force_ascii=False)
+    logger.info(f"  ✅ JSON: {json_path}")
+    
+    try:
+        parquet_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete.parquet')
+        df.to_parquet(parquet_path, index=False)
+        logger.info(f"  ✅ Parquet: {parquet_path}")
+    except:
+        pass
+
