@@ -853,3 +853,30 @@ def run_etl_pipeline():
     except:
         pass
 
+    # Step 6: Generate report
+    logger.info("\n📈 Step 6: Generating summary report...")
+    generate_summary_report(df)
+    
+    # Step 7: Final statistics
+    logger.info("\n" + "=" * 70)
+    logger.info("ETL PIPELINE COMPLETED SUCCESSFULLY")
+    logger.info("=" * 70)
+    logger.info(f"\n📊 Final Statistics:")
+    logger.info(f"   Total cases: {len(df)}")
+    logger.info(f"   Known verdicts: {(df['Verdict'] != 'Verdict Unknown').sum()} ({(df['Verdict'] != 'Verdict Unknown').sum()/len(df)*100:.1f}%)")
+    logger.info(f"   Classified: {(df['Case_Type'] != 'Unclassified').sum()} ({(df['Case_Type'] != 'Unclassified').sum()/len(df)*100:.1f}%)")
+    logger.info(f"   Specific sub-types: {(df['Sub_Type'] != 'General').sum()} ({(df['Sub_Type'] != 'General').sum()/len(df)*100:.1f}%)")
+    logger.info(f"   Total citations: {df['Num_Citations'].sum()}")
+    logger.info(f"\n📁 Output: {OUTPUT_DIR}")
+    
+    # Preview sample
+    print("\n" + "=" * 70)
+    print("SAMPLE OUTPUT (First 5 cases):")
+    print("=" * 70)
+    cols = ['Case_ID', 'Year', 'Court', 'Case_Type', 'Sub_Type', 'Verdict', 'Num_Citations']
+    available = [c for c in cols if c in df.columns]
+    print(df[available].head(5).to_string())
+    
+    return df
+
+
