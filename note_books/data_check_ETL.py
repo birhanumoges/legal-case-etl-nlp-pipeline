@@ -727,9 +727,6 @@ def process_single_case(case_info: Dict) -> Optional[Dict]:
             'Sub_Type': sub_type,
             'Num_Citations': len(citations),
             'Legal_Citations': '; '.join(citations[:20]),
-            'Has_Metadata': case_info['metadata'] is not None,
-            'HTML_File': str(case_info['html_file']),
-            'JSON_File': str(case_info['json_file']),
             'Decision_Date': json_metadata.get('decision_date', ''),
             'Docket_Number': json_metadata.get('docket_number', ''),
             'First_Page': json_metadata.get('first_page', ''),
@@ -838,7 +835,7 @@ def run_etl_pipeline():
     # Step 5: Save outputs
     logger.info("\n💾 Step 5: Saving outputs...")
     
-    csv_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete.csv')
+    csv_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete22.csv')
     df.to_csv(csv_path, index=False, encoding='utf-8')
     logger.info(f"  ✅ CSV: {csv_path}")
     
@@ -847,7 +844,7 @@ def run_etl_pipeline():
     logger.info(f"  ✅ JSON: {json_path}")
     
     try:
-        parquet_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete.parquet')
+        parquet_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete22.parquet')
         df.to_parquet(parquet_path, index=False)
         logger.info(f"  ✅ Parquet: {parquet_path}")
     except:
@@ -888,7 +885,7 @@ if __name__ == "__main__":
     
     # Save sample for quick inspection
     if not df.empty:
-        sample_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete.csv')
+        sample_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete22.csv')
         df.to_csv(sample_path, index=False)
         print(f"\n📄 cases saved to: {sample_path}")
         
@@ -902,4 +899,3 @@ if __name__ == "__main__":
             print(f"Sub_Type: {murphy_cases.iloc[0]['Sub_Type']}")  # Should now be "Larceny" not "General"
             print(f"Verdict: {murphy_cases.iloc[0]['Verdict']}")
             print(f"Citations: {murphy_cases.iloc[0]['Num_Citations']}")
-
