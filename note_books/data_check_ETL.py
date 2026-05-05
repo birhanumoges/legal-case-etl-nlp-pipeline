@@ -879,4 +879,27 @@ def run_etl_pipeline():
     
     return df
 
+# ============================================================
+# RUN THE PIPELINE
+# ============================================================
+
+if __name__ == "__main__":
+    df = run_etl_pipeline()
+    
+    # Save sample for quick inspection
+    if not df.empty:
+        sample_path = os.path.join(OUTPUT_DIR, 'legal_cases_complete.csv')
+        df.to_csv(sample_path, index=False)
+        print(f"\n📄 cases saved to: {sample_path}")
+        
+        # Show specific example for The State v. Murphy if it exists
+        murphy_cases = df[df['Case_Name'].str.contains('Murphy', na=False)]
+        if not murphy_cases.empty:
+            print("\n" + "=" * 70)
+            print("VERIFICATION: The State v. Murphy")
+            print("=" * 70)
+            print(f"Case_Type: {murphy_cases.iloc[0]['Case_Type']}")
+            print(f"Sub_Type: {murphy_cases.iloc[0]['Sub_Type']}")  # Should now be "Larceny" not "General"
+            print(f"Verdict: {murphy_cases.iloc[0]['Verdict']}")
+            print(f"Citations: {murphy_cases.iloc[0]['Num_Citations']}")
 
