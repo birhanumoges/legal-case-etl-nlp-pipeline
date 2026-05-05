@@ -251,176 +251,384 @@ def extract_verdict(text: str) -> str:
             if callable(result):
                 return result(match)
             return result
-
+        
 # ============================================================
-# STEP 5: CASE TYPE CLASSIFICATION (IMPROVED)
+# STEP 5: CASE TYPE CLASSIFICATION (FULLY FIXED)
 # ============================================================
 
 def extract_case_type(text: str) -> str:
-    """Classify case type using weighted keyword matching"""
+    """
+    Classify case type using weighted keyword matching - FULLY FIXED.
+    PRIORITY 1: Check for slander/defamation FIRST (these are TORTS, not criminal)
+    PRIORITY 2: Check for criminal cases
+    PRIORITY 3: Check for other case types
+    """
     t = text.lower()
     
-    type_keywords = {
-        "Criminal Law": {
-            'keywords': ['indictment', 'larceny', 'murder', 'felony', 'misdemeanor', 'guilty', 
-                        'theft', 'robbery', 'burglary', 'homicide', 'manslaughter', 'assault',
-                        'battery', 'crime', 'criminal', 'state', 'prosecution', 'grand jury'],
-            'weight': 3
-        },
-        "Civil Procedure": {
-            'keywords': ['demurrer', 'plea', 'pleading', 'writ', 'jurisdiction', 'venue', 
-                        'continuance', 'appeal', 'error', 'scire facias', 'replevin', 'assumpsit',
-                        'verification', 'replication', 'joinder', 'nul tiel record'],
-            'weight': 2
-        },
-        "Contract Law - Debt": {
-            'keywords': ['debt', 'bond', 'promissory note', 'covenant', 'contract', 'payment', 
-                        'interest', 'usury', 'consideration', 'obligation', 'surety', 'bail'],
-            'weight': 2
-        },
-        "Property Law - Ejectment": {
-            'keywords': ['ejectment', 'possession', 'land', 'real estate', 'title', 'deed', 
-                        'conveyance', 'mortgage', 'foreclosure', 'equity of redemption', 'tenement'],
-            'weight': 2
-        },
-        "Property Law - Execution Sale": {
-            'keywords': ['execution', 'sheriff', 'sale', 'levy', 'fi. fa.', 'ca. sa.', 
-                        'fieri facias', 'capias', 'venditioni exponas', 'goods'],
-            'weight': 2
-        },
-        "Family Law - Dower": {
-            'keywords': ['dower', 'dowable', 'widow', 'marriage', 'coverture', 'cestui que trust', 
-                        'heir', 'inheritance', 'dower rights'],
-            'weight': 2
-        },
-        "Torts": {
-            'keywords': ['trespass', 'negligence', 'damages', 'assault', 'battery', 'slander', 
-                        'libel', 'injury', 'conversion', 'nuisance'],
-            'weight': 2
-        },
+    # ============================================================
+    # PRIORITY 1: Defamation/Slander (MUST come before Criminal check)
+    # ============================================================
+    # If it's a slander case, it should NEVER be Criminal Law
+    slander_keywords = [
+        'slander', 'defamation', 'libel', 'scandalous words', 
+        'action on the case', 'words spoken', 'actionable words',
+        'for slanderous words', 'charged with adultery', 'fornication',
+        'action on the case for slander', 'slanderous words'
+    ]
+    if any(kw in t for kw in slander_keywords):
+        return "Torts - Defamation"
+    
+    # ============================================================
+    # PRIORITY 2: Criminal Law
+    # ============================================================
+    criminal_keywords = [
+        'indictment', 'larceny', 'murder', 'felony', 'misdemeanor', 'guilty', 
+        'theft', 'robbery', 'burglary', 'homicide', 'manslaughter', 'assault',
+        'battery', 'crime', 'criminal', 'state', 'prosecution', 'grand jury',
+        'counterfeiting', 'perjury', 'quo warranto', 'contra formam statuti'
+    ]
+    
+    criminal_score = 0
+    for keyword in criminal_keywords:
+        if keyword in t:
+            criminal_score += 3
+    
+    # ============================================================
+    # PRIORITY 3: Civil Procedure
+    # ============================================================
+    civil_keywords = [
+        'demurrer', 'plea', 'pleading', 'writ', 'jurisdiction', 'venue', 
+        'continuance', 'appeal', 'error', 'scire facias', 'replevin', 'assumpsit',
+        'verification', 'replication', 'joinder', 'nul tiel record', 'habeas corpus',
+        'certiorari', 'mandamus', 'injunction', 'bill of exceptions'
+    ]
+    
+    civil_score = 0
+    for keyword in civil_keywords:
+        if keyword in t:
+            civil_score += 2
+    
+    # ============================================================
+    # PRIORITY 4: Contract Law
+    # ============================================================
+    contract_keywords = [
+        'debt', 'bond', 'promissory note', 'covenant', 'contract', 'payment', 
+        'interest', 'usury', 'consideration', 'obligation', 'surety', 'bail',
+        'negotiable instrument', 'specialty', 'sealed note'
+    ]
+    
+    contract_score = 0
+    for keyword in contract_keywords:
+        if keyword in t:
+            contract_score += 2
+    
+    # ============================================================
+    # PRIORITY 5: Property - Ejectment
+    # ============================================================
+    property_eject_keywords = [
+        'ejectment', 'possession', 'land', 'real estate', 'title', 'deed', 
+        'conveyance', 'mortgage', 'foreclosure', 'equity of redemption', 'tenement',
+        'adverse possession', 'disseisin', 'lease', 'demise'
+    ]
+    
+    property_eject_score = 0
+    for keyword in property_eject_keywords:
+        if keyword in t:
+            property_eject_score += 2
+    
+    # ============================================================
+    # PRIORITY 6: Property - Execution Sale
+    # ============================================================
+    property_exec_keywords = [
+        'execution', 'sheriff', 'sale', 'levy', 'fi. fa.', 'ca. sa.', 
+        'fieri facias', 'capias', 'venditioni exponas', 'goods',
+        'replevin bond', 'distress'
+    ]
+    
+    property_exec_score = 0
+    for keyword in property_exec_keywords:
+        if keyword in t:
+            property_exec_score += 2
+    
+    # ============================================================
+    # PRIORITY 7: Torts (non-defamation)
+    # ============================================================
+    torts_keywords = [
+        'trespass', 'negligence', 'damages', 'injury', 'conversion', 'nuisance',
+        'trover', 'case', 'mesne profits'
+    ]
+    
+    torts_score = 0
+    for keyword in torts_keywords:
+        if keyword in t:
+            torts_score += 2
+    
+    # ============================================================
+    # DECISION LOGIC - Highest score wins
+    # ============================================================
+    scores = {
+        "Criminal Law": criminal_score,
+        "Civil Procedure": civil_score,
+        "Contract Law - Debt": contract_score,
+        "Property Law - Ejectment": property_eject_score,
+        "Property Law - Execution Sale": property_exec_score,
+        "Torts": torts_score
     }
     
-    scores = defaultdict(int)
-    for case_type, info in type_keywords.items():
-        for keyword in info['keywords']:
-            if keyword in t:
-                scores[case_type] += info['weight']
+    # Find max score
+    max_score = max(scores.values())
     
-    if scores:
-        return max(scores, key=scores.get)
+    if max_score > 0:
+        for case_type, score in scores.items():
+            if score == max_score:
+                return case_type
+    
     return "Unclassified"
 
+
 # ============================================================
-# STEP 6: SUB-TYPE EXTRACTION (FIXED - NOW HANDLES CRIMINAL CASES)
+# STEP 6: SUB-TYPE EXTRACTION (FULLY FIXED)
 # ============================================================
 
 def extract_sub_type(text: str, case_type: str) -> str:
-    """Extract fine-grained sub-type with improved criminal law detection"""
+    """
+    Extract fine-grained sub-type - FULLY FIXED.
+    Uses ordered keyword-label pairs per case type.
+    Prevents "General" from firing too easily - checks all specific patterns first.
+    """
     t = text.lower()
     
-    # Criminal Law sub-types (FIXED - Now properly detects Larceny, etc.)
+    # ============================================================
+    # TORTS - DEFAMATION SUB-TYPES (FIXES CASE 0086)
+    # ============================================================
+    if case_type == "Torts - Defamation":
+        if any(kw in t for kw in ['slander', 'words spoken', 'scandalous words', 'slanderous']):
+            return "Slander"
+        if 'libel' in t:
+            return "Libel"
+        return "Defamation"
+    
+    # ============================================================
+    # CRIMINAL LAW SUB-TYPES (ORDERED - MOST SPECIFIC FIRST)
+    # ============================================================
     if case_type == "Criminal Law":
-        if any(kw in t for kw in ['larceny', 'steal', 'stolen', 'theft', 'petit larceny', 'grand larceny']):
+        # Check for Larceny (most specific first)
+        if any(kw in t for kw in ['larceny', 'grand larceny', 'petit larceny']):
             return "Larceny"
-        if any(kw in t for kw in ['murder', 'homicide', 'kill', 'manslaughter', 'slay']):
+        if any(kw in t for kw in ['steal', 'stolen goods', 'receiving stolen', 'stole', 'theft']):
+            return "Larceny"
+        
+        # Check for Homicide
+        if any(kw in t for kw in ['murder', 'homicide', 'manslaughter', 'slay', 'mortal wound']):
             return "Homicide"
-        if any(kw in t for kw in ['assault', 'battery', 'assault and battery']):
+        if 'kill' in t and ('person' in t or 'man' in t or 'woman' in t):
+            return "Homicide"
+        
+        # Check for Assault & Battery
+        if 'assault and battery' in t or 'assault & battery' in t:
             return "Assault & Battery"
-        if any(kw in t for kw in ['burglary', 'robbery', 'break']):
+        if 'assault' in t and 'battery' in t:
+            return "Assault & Battery"
+        if any(kw in t for kw in ['assault', 'battery']):
+            return "Assault & Battery"
+        
+        # Check for Burglary/Robbery
+        if any(kw in t for kw in ['burglary', 'robbery', 'housebreaking', 'breaking and entering']):
             return "Burglary/Robbery"
-        if any(kw in t for kw in ['indictment', 'grand jury']):
+        
+        # Check for Counterfeiting
+        if any(kw in t for kw in ['counterfeiting', 'forgery', 'forged', 'counterfeit']):
+            return "Counterfeiting"
+        
+        # Check for Perjury
+        if any(kw in t for kw in ['perjury', 'false oath', 'forsworn', 'swore falsely']):
+            return "Perjury"
+        
+        # Check for Affray
+        if 'affray' in t:
+            return "Affray"
+        
+        # Check for Riot
+        if 'riot' in t:
+            return "Riot"
+        
+        # Check for Indictment (general criminal proceeding)
+        if 'indictment' in t and 'found' in t:
             return "Indictment"
+        
+        # Only now fall back to General Criminal
         return "General Criminal"
     
-    # Civil Procedure sub-types
+    # ============================================================
+    # CIVIL PROCEDURE SUB-TYPES
+    # ============================================================
     if case_type == "Civil Procedure":
-        if any(kw in t for kw in ['demurrer', 'demur']):
+        # Demurrer
+        if any(kw in t for kw in ['demurrer', 'demur', 'demurred']):
             return "Demurrer"
-        if any(kw in t for kw in ['appeal', 'writ of error', 'error']):
+        
+        # Appeal / Error
+        if any(kw in t for kw in ['appeal', 'writ of error', 'error', 'appellate']):
             return "Appeal"
+        
+        # Scire Facias
+        if 'scire facias' in t:
+            return "Scire Facias"
+        
+        # Attachment
+        if 'attachment' in t and ('foreign' in t or 'domestic' in t or 'property' in t):
+            return "Attachment"
+        
+        # Habeas Corpus
+        if 'habeas corpus' in t:
+            return "Habeas Corpus"
+        
+        # Default Judgment
         if any(kw in t for kw in ['default', 'defaulted', 'nil dicit']):
             return "Default Judgment"
-        if any(kw in t for kw in ['plea', 'pleading', 'replication', 'rejoinder']):
+        
+        # Pleading
+        if any(kw in t for kw in ['plea', 'pleading', 'replication', 'rejoinder', 'surrejoinder']):
             return "Pleading"
-        if any(kw in t for kw in ['writ', 'scire facias', 'certiorari', 'mandamus']):
+        
+        # Writ
+        if any(kw in t for kw in ['writ', 'certiorari', 'mandamus', 'prohibition']):
             return "Writ"
-        if any(kw in t for kw in ['continuance', 'adjournment']):
+        
+        # Continuance
+        if any(kw in t for kw in ['continuance', 'adjournment', 'postponement']):
             return "Continuance"
-        if any(kw in t for kw in ['habeas corpus']):
-            return "Habeas Corpus"
+        
         return "General Civil Procedure"
     
-    # Contract Law sub-types
+    # ============================================================
+    # CONTRACT LAW SUB-TYPES
+    # ============================================================
     if case_type == "Contract Law - Debt":
-        if any(kw in t for kw in ['promissory note', 'note', 'negotiable instrument']):
+        # Promissory Note
+        if any(kw in t for kw in ['promissory note', 'note payable', 'negotiable instrument']):
             return "Promissory Note"
-        if any(kw in t for kw in ['bond', 'obligation', 'specialty']):
+        if 'note' in t and ('promise' in t or 'pay' in t):
+            return "Promissory Note"
+        
+        # Bond
+        if any(kw in t for kw in ['bond', 'obligation', 'writing obligatory', 'specialty', 'sealed']):
             return "Bond"
-        if any(kw in t for kw in ['debt', 'indebtedness', 'recovery']):
+        
+        # Debt Collection
+        if any(kw in t for kw in ['debt', 'indebtedness', 'recovery', 'collect']):
             return "Debt Collection"
-        if any(kw in t for kw in ['usury', 'usurious']):
+        
+        # Usury
+        if any(kw in t for kw in ['usury', 'usurious', 'interest']):
             return "Usury"
-        if any(kw in t for kw in ['breach', 'non-performance']):
+        
+        # Breach of Contract
+        if any(kw in t for kw in ['breach', 'non-performance', 'failed to perform']):
             return "Breach of Contract"
+        
         return "General Contract"
     
-    # Property Law - Ejectment sub-types
+    # ============================================================
+    # PROPERTY LAW - EJECTMENT SUB-TYPES
+    # ============================================================
     if case_type == "Property Law - Ejectment":
-        if any(kw in t for kw in ['ejectment', 'recovery of land', 'possession']):
+        # Ejectment
+        if any(kw in t for kw in ['ejectment', 'recovery of land', 'possession of land']):
             return "Ejectment"
-        if any(kw in t for kw in ['foreclosure', 'mortgage', 'equity of redemption']):
+        
+        # Mortgage Foreclosure
+        if any(kw in t for kw in ['foreclosure', 'mortgage', 'equity of redemption', 'scire facias']):
             return "Mortgage Foreclosure"
-        if any(kw in t for kw in ['title', 'quiet title', 'cloud on title']):
+        
+        # Title Dispute
+        if any(kw in t for kw in ['title', 'quiet title', 'cloud on title', 'legal title', 'equitable title']):
             return "Title Dispute"
-        if any(kw in t for kw in ['adverse possession', 'disseisin']):
+        
+        # Adverse Possession
+        if any(kw in t for kw in ['adverse possession', 'disseisin', 'peaceable possession']):
             return "Adverse Possession"
+        
         return "General Property"
     
-    # Property Law - Execution Sale sub-types
+    # ============================================================
+    # PROPERTY LAW - EXECUTION SALE SUB-TYPES
+    # ============================================================
     if case_type == "Property Law - Execution Sale":
-        if any(kw in t for kw in ['sheriff sale', 'execution sale']):
+        # Sheriff Sale
+        if any(kw in t for kw in ['sheriff sale', 'execution sale', 'sheriff\'s deed']):
             return "Sheriff Sale"
+        
+        # Fieri Facias
         if any(kw in t for kw in ['fi. fa.', 'fieri facias']):
             return "Fieri Facias"
-        if any(kw in t for kw in ['ca. sa.', 'capias']):
+        
+        # Capias
+        if any(kw in t for kw in ['ca. sa.', 'capias', 'capias ad satisfaciendum']):
             return "Capias"
+        
         return "General Execution"
     
-    # Family Law - Dower sub-types
+    # ============================================================
+    # FAMILY LAW - DOWER SUB-TYPES
+    # ============================================================
     if case_type == "Family Law - Dower":
         if any(kw in t for kw in ['dower', 'dowable', 'dower rights']):
             return "Dower Rights"
-        if any(kw in t for kw in ['heir', 'inheritance', 'devise', 'legatee']):
+        
+        if any(kw in t for kw in ['heir', 'inheritance', 'devise', 'legatee', 'will']):
             return "Inheritance"
+        
         return "General Family Law"
     
-    # Torts sub-types
+    # ============================================================
+    # TORTS (NON-DEFAMATION) SUB-TYPES
+    # ============================================================
     if case_type == "Torts":
-        if any(kw in t for kw in ['slander', 'defamation', 'libel']):
-            return "Defamation"
-        if any(kw in t for kw in ['trespass']):
+        if 'trespass' in t:
             return "Trespass"
+        
         if any(kw in t for kw in ['assault', 'battery']):
             return "Assault & Battery"
-        if any(kw in t for kw in ['negligence']):
+        
+        if 'negligence' in t:
             return "Negligence"
+        
+        if 'conversion' in t or 'trover' in t:
+            return "Conversion"
+        
         return "General Torts"
     
-    # Fallback for Unclassified
-    general = {
-        "Foreclosure": ['foreclosure'],
-        "Appeal": ['appeal', 'writ of error'],
-        "Demurrer": ['demurrer', 'demur'],
-        "Default": ['default', 'default judgment'],
-        "Larceny": ['larceny', 'steal', 'theft'],
-        "Homicide": ['murder', 'homicide', 'kill']
-    }
+    # ============================================================
+    # FALLBACK FOR UNCLASSIFIED - Check common patterns
+    # ============================================================
+    common_patterns = [
+        ('larceny', 'Larceny'),
+        ('steal', 'Larceny'),
+        ('theft', 'Larceny'),
+        ('stolen', 'Larceny'),
+        ('murder', 'Homicide'),
+        ('homicide', 'Homicide'),
+        ('kill', 'Homicide'),
+        ('assault', 'Assault & Battery'),
+        ('battery', 'Assault & Battery'),
+        ('appeal', 'Appeal'),
+        ('writ of error', 'Appeal'),
+        ('demurrer', 'Demurrer'),
+        ('ejectment', 'Ejectment'),
+        ('foreclosure', 'Mortgage Foreclosure'),
+        ('mortgage', 'Mortgage Foreclosure'),
+        ('slander', 'Slander'),
+        ('defamation', 'Defamation'),
+        ('bond', 'Bond'),
+        ('promissory note', 'Promissory Note'),
+    ]
     
-    for sub_type, keywords in general.items():
-        if any(kw in t for kw in keywords):
+    for keyword, sub_type in common_patterns:
+        if keyword in t:
             return sub_type
     
-    return "General"
+    return "Unclassified"
 
 # ============================================================
 # STEP 7: CITATION EXTRACTION
