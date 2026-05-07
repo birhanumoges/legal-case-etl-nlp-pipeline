@@ -252,6 +252,131 @@ def extract_verdict(text: str) -> str:
                 return result(match)
             return result
         
+    # ============================================================
+    # METHOD 2: Look for explicit judgment statements (anywhere)
+    # ============================================================
+    
+    # Priority patterns (highest confidence)
+    priority_patterns = [
+        # Per Curiam with judgment (most authoritative)
+        (r'per curiam[^.]*\.\s*(?:the\s+)?(?:judgment|decree|order|verdict)\s+is\s+(reversed|affirmed|remanded)(?:\s+with\s+costs)?\.?', 
+         lambda m: f"Per Curiam: Judgment {m.group(1).upper()}" + (" with costs" if 'with costs' in m.group(0) else "")),
+        (r'per curiam[^.]*\.\s*the\s+arrest\s+of\s+judgment\s+is\s+(reversed|affirmed)', 
+         lambda m: f"Per Curiam: Arrest of Judgment {m.group(1).upper()}"),
+        
+        # Direct judgment statements
+        (r'(?:the\s+)?judgment\s+of\s+the\s+court\s+below\s+is\s+(reversed|affirmed|remanded)(?:\s+with\s+costs)?\.?', 
+         lambda m: f"Judgment {m.group(1).upper()}" + (" with costs" if 'with costs' in m.group(0) else "")),
+        (r'(?:the\s+)?(?:judgment|decree)\s+is\s+(reversed|affirmed|remanded)(?:\s+with\s+costs)?\.?',
+         lambda m: f"Judgment {m.group(1).upper()}" + (" with costs" if 'with costs' in m.group(0) else "")),
+        (r'(?:the\s+)?(?:judgment|decree)\s+is\s+(affirmed|reversed)(?:\s+with\s+costs)?\.?', 
+         lambda m: f"Judgment {m.group(1).upper()}" + (" with costs" if 'with costs' in m.group(0) else "")),
+        
+        # Compound judgments (partial affirmance/reversal)
+        (r'judgment\s+as\s+to\s+the\s+debt[^.]*is\s+affirmed[^.]*as\s+to\s+the\s+damages\s+reversed',
+         "Judgment AFFIRMED in part, REVERSED in part"),
+        (r'judgment\s+(?:as\s+to\s+[^,]+)?\s*affirmed[^.]*reversed', 
+         "Judgment AFFIRMED in part, REVERSED in part"),
+    ]
+    
+    for pattern, result in priority_patterns:
+        match = re.search(pattern, text_lower)
+        if match:
+            if callable(result):
+                return result(match)
+            return result
+    
+    # ============================================================
+    # METHOD 3: Look at end of document (last 2000 chars)
+    # ============================================================
+    
+    end_section = text_lower[-2500:] if len(text_lower) > 2500 else text_lower
+    
+    verdict_patterns = [
+        # Per Curiam variations with complete sentence
+        (r'per curiam\.\s+(?:the\s+)?(?:judgment|decree|verdict)\s+is\s+(reversed|affirmed|set aside)(?:\s+with\s+costs)?\.', 
+         lambda m: f"Per Curiam: Judgment {m.group(1).upper()}" + (" with costs" if 'with costs' in m.group(0) else "")),
+        (r'per curiam\.\s*(.*?)(reversed|affirmed|set aside)', 
+         lambda m: f"Per Curiam: {m.group(1).strip().title()} {m.group(2).upper()}" if m.group(1) else f"Per Curiam: {m.group(2).upper()}"),
+        (r'per curiam\s*[–-]\s*(reversed|affirmed)', 
+         lambda m: f"Per Curiam: Judgment {m.group(1).upper()}"),
+        
+        # Court decree statements
+        (r'the\s+court\s+entered\s+a\s+decree\s+in\s+favou?r\s+of\s+the\s+(complainant|plaintiff|defendant)',
+         lambda m: f"Decree for {m.group(1).title()}"),
+        (r'decree\s+(?:was\s+)?(reversed|affirmed|dismissed)(?:\s+with\s+costs)?\.?',
+         lambda m: f"Decree {m.group(1).upper()}" + (" with costs" if 'with costs' in m.group(0) else "")),
+        (r'the\s+decree\s+is\s+(reversed|affirmed|dismissed)(?:\s+with\s+costs)?\.?',
+         lambda m: f"Decree {m.group(1).upper()}" + (" with costs" if 'with costs' in m.group(0) else "")),
+        (r'the\s+bill\s+is\s+dismissed', "Bill Dismissed"),
+        (r'the\s+injunction\s+is\s+(dissolved|granted|denied)',
+         lambda m: f"Injunction {m.group(1).upper()}"),
+        
+        # Criminal verdicts
+        (r'jury\s+(?:found|finds)\s+the\s+defendant\s+(guilty|not guilty)',
+         lambda m: f"Verdict: {m.group(1).upper()}"),
+        (r'defendant\s+is\s+found\s+(guilty|not guilty)',
+         lambda m: f"Found {m.group(1).upper()}"),
+        (r'verdict\s+of\s+guilty', "Verdict: GUILTY"),
+        (r'verdict\s+of\s+not guilty', "Verdict: NOT GUILTY"),
+        
+        # Plea outcomes
+        (r'plea\s+(?:is\s+)?(?:held\s+)?(good|bad|sufficient|insufficient)',
+         lambda m: f"Plea {m.group(1).upper()}"),
+        (r'plea\s+sustained', "Plea SUSTAINED"),
+        (r'plea\s+overruled', "Plea OVERRULED"),
+        (r'demurrer\s+(?:is\s+)?(sustained|overruled)',
+         lambda m: f"Demurrer {m.group(1).upper()}"),
+        
+        # Appeal outcomes
+        (r'writ\s+of\s+error\s+(sustained|denied)',
+         lambda m: f"Writ of Error {m.group(1).upper()}"),
+        (r'appeal\s+(dismissed|sustained)',
+         lambda m: f"Appeal {m.group(1).upper()}"),
+        
+        # Sale/Property outcomes
+        (r'sale\s+(?:is\s+)?(?:declared\s+)?void', "Sale Void"),
+        (r'deed\s+conveyed\s+no\s+title', "No Title Conveyed"),
+        (r'judgment\s+void', "Judgment Void"),
+        (r'execution\s+quashed', "Execution Quashed"),
+        
+        # Procedural outcomes
+        (r'case\s+(?:is\s+)?dismissed', "Case Dismissed"),
+        (r'indictment\s+quashed', "Indictment Quashed"),
+        (r'motion\s+(?:is\s+)?(?:granted|overruled|sustained|denied)',
+         lambda m: f"Motion {m.group(1).upper()}" if m.group(1) else "Motion Ruled"),
+        (r'new\s+trial\s+(?:is\s+)?(?:granted|denied)',
+         lambda m: f"New Trial {m.group(1).upper()}"),
+        
+        # Remand
+        (r'cause\s+remanded', "Remanded"),
+        (r'remanded\s+for\s+further\s+proceedings', "Remanded"),
+        
+        # Affirmance with variations
+        (r'(?:judgment|decree)\s+affirmed\s+with\s+costs\.?', "Judgment AFFIRMED with costs"),
+        (r'(?:judgment|decree)\s+affirmed\.?', "Judgment AFFIRMED"),
+        
+        # Reversal with variations
+        (r'(?:judgment|decree)\s+reversed\s+with\s+costs\.?', "Judgment REVERSED with costs"),
+        (r'(?:judgment|decree)\s+reversed\.?', "Judgment REVERSED"),
+        
+        # Set aside
+        (r'verdict\s+set\s+aside', "Verdict SET ASIDE"),
+        (r'(?:judgment|proceedings)\s+set\s+aside', "Proceedings Set Aside"),
+        
+        # Bar to recovery
+        (r'bar\s+to\s+recovery', "Recovery Barred"),
+        (r'(?:further\s+)?recovery\s+barred', "Recovery Barred"),
+    ]
+    
+    for pattern, result in verdict_patterns:
+        match = re.search(pattern, end_section)
+        if match:
+            if callable(result):
+                return result(match)
+            return result
+    
+        
 # ============================================================
 # STEP 5: CASE TYPE CLASSIFICATION (FULLY FIXED)
 # ============================================================
