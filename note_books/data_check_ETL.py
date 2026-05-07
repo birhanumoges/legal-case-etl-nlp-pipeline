@@ -473,7 +473,45 @@ def extract_verdict(text: str) -> str:
         if 'denied' in last_500:
             return "Writ of Error DENIED"
     
+    # ============================================================
+    # PROCEDURAL RULINGS (for cases without final judgments)
+    # ============================================================
+
+    procedural_patterns = [
+        (r'demurrer\s+(?:is\s+)?(sustained|overruled)', 'Demurrer {}'),
+        (r'plea\s+(?:is\s+)?(good|bad|sufficient|insufficient)', 'Plea {}'),
+        (r'motion\s+(?:is\s+)?(granted|denied|overruled|sustained)', 'Motion {}'),
+        (r'instruction\s+(?:was\s+)?(refused|given)', 'Instruction {}'),
+        (r'injunction\s+(?:is\s+)?(granted|denied|dissolved)', 'Injunction {}'),
+        (r'writ\s+of\s+error\s+(sustained|denied)', 'Writ of Error {}'),
+        (r'bill\s+dismissed', 'Bill Dismissed'),
+    ]
+
+    for pattern, template in procedural_patterns:
+        match = re.search(pattern, text_lower)
+        if match:
+            if '{}' in template and match.groups():
+                return template.format(match.group(1).upper())
+            return template
+
+    # If still unknown and has legal holdings but no judgment
+    if re.search(r'held.*that|the court held|the following points were determined', text_lower[:2000]):
+        if not re.search(r'(judgment|decree|verdict).*(reversed|affirmed|entered)', text_lower[-1500:]):
+            return "Legal Ruling (No Final Judgment)"
+
+    # ============================================================
+    # FINAL FALLBACK: Check for any reversal/affirmation indication
+    # ============================================================
     
+    if 'reversed' in last_500 and 'judgment' in last_500:
+        return "Judgment REVERSED"
+    if 'affirmed' in last_500 and 'judgment' in last_500:
+        return "Judgment AFFIRMED"
+    if 'set aside' in last_500:
+        return "Set Aside"
+
+    return "Verdict Unknown"
+
         
 # ============================================================
 # STEP 5: CASE TYPE CLASSIFICATION (FULLY FIXED)
