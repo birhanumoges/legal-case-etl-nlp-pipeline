@@ -1,0 +1,6 @@
+beautifulsoup4>=4.12
+pandas>=2.0
+numpy>=1.24
+pyarrow>=14.0      # for Parquet support
+lxml>=4.9          # faster BS4 parser (optional but recommended)
+pytest>=7.4        # for running tests
