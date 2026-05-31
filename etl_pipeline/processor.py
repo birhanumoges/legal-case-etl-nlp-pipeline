@@ -35,9 +35,9 @@ from extractors.metadata_extractor import (extract_metadata_from_json,
 from extractors.verdict_extractor  import extract_verdict
 from extractors.classifier         import extract_case_type, extract_sub_type
 from extractors.citation_extractor import extract_citations
-from pipeline.validator            import validate
-from pipeline.checkpoint           import Checkpoint
-from pipeline.reporter             import save_outputs, generate_summary_report
+from etl_pipeline.validator            import validate
+from etl_pipeline.checkpoint           import Checkpoint
+from etl_pipeline.reporter             import save_outputs, generate_summary_report
 from utils.logger                  import get_logger
 
 logger = get_logger(__name__)
