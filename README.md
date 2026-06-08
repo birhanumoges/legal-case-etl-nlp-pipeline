@@ -12,38 +12,6 @@ ETL pipeline that converts historical court case HTML/JSON into structured NLP-r
 | **Explainability** | SHAP + TF-IDF feature importance |
 | **API** | FastAPI REST endpoints for prediction + RAG |
 
-## Folder Structure
-
-```
-legal_nlp/
-├── main.py                  # Orchestrator — run this
-├── config.py                # All paths & constants
-├── requirements.txt
-├── extractors/              # JSON → text, metadata, verdict, citations
-├── preprocessing/           # Clean, encode, split, embed
-├── modeling/                # 3 models × 3 targets, trainer, SHAP
-├── rag/                     # Retriever, generator, RAG pipeline
-├── vectorstore/             # FAISS index + embeddings
-├── database/                # PostgreSQL ORM + schema
-├── explainability/          # SHAP + feature importance
-├── pipeline/                # ETL orchestration + checkpoints
-├── api/                     # FastAPI app
-├── evaluation/              # Metrics, class balance, RAG eval
-├── visualization/           # EDA, confusion matrix, SHAP plots
-├── time_series/             # Trend analysis + forecasting
-├── utils/                   # Logger, text helpers, config loader
-├── notebooks/               # Jupyter notebooks
-├── tests/                   # pytest test suite
-└── output/                  # All saved outputs
-    ├── clean_data.csv
-    ├── unknown_case_data.csv
-    ├── full_data.csv
-    ├── models/
-    ├── reports/
-    ├── plots/
-    └── vectorstore/
-```
-
 ## Setup
 
 ```bash
@@ -155,3 +123,175 @@ All outputs are saved to `output/`:
 | `plots/ts_*.png` | Time-series + forecast plots |
 | `models/*.joblib` | Saved best models + feature encoder |
 | `vectorstore/` | FAISS index + embeddings |
+Legal NLP Platform
+End-to-end legal case classification, verdict prediction, analytics, and semantic search.
+---
+Project Structure
+```
+legal_nlp/
+├── main.py                    # Data science pipeline orchestrator
+├── config.py                  # All paths, constants, hyperparameters
+├── requirements.txt
+├── alembic.ini                # Database migration config
+├── docker-compose.yml         # Full-stack Docker orchestration
+├── Dockerfile.api             # Backend Docker image
+├── .env.example               # Environment variable template
+│
+├── extractors/                # Rule-based ETL extractors
+├── preprocessing/             # Feature encoding, cleaning, splitting
+├── modeling/                  # LR / SVM / XGBoost classifiers
+├── pipeline/                  # ETL orchestration + checkpoints
+├── evaluation/                # Metrics, class balance, RAG eval
+├── visualization/             # EDA, confusion matrix, SHAP plots
+├── time_series/               # ARIMA forecasting + trend analysis
+├── explainability/            # Feature importance + SHAP
+├── rag/                       # Retrieval-Augmented Generation
+├── vectorstore/               # FAISS index + embeddings
+├── database/                  # SQLAlchemy ORM + migrations
+├── utils/                     # Logger, text helpers
+├── tests/                     # pytest test suite
+├── notebooks/                 # Jupyter analysis notebooks
+│
+├── api/                       # FastAPI backend
+│   ├── app.py                 # Entry point — registers all routers
+│   ├── routes.py              # GET /health, POST /predict, POST /rag/query
+│   ├── routes_auth.py         # POST /auth/login
+│   ├── routes_cases.py        # GET/POST /cases  GET /cases/{id}
+│   ├── routes_analytics.py    # GET /analytics/stats|yearly|forecast|models
+│   ├── routes_predict.py      # POST /predict/batch
+│   ├── schemas.py             # All Pydantic models
+│   └── dependencies.py        # JWT auth, pagination
+│
+├── scripts/
+│   ├── run_api.py             # Start API server
+│   ├── seed_db.py             # Load clean_data.csv → PostgreSQL
+│   ├── build_vectorstore.py   # Build FAISS index
+│   ├── export_reports.py      # Export all outputs to ZIP
+│   └── check_health.py        # Verify pipeline + API health
+│
+├── frontend/                  # React + Tailwind frontend
+│   ├── src/
+│   │   ├── App.jsx            # Router
+│   │   ├── pages/
+│   │   │   ├── Login.jsx      # JWT login
+│   │   │   ├── Dashboard.jsx  # Overview stats + charts
+│   │   │   ├── Cases.jsx      # Browseable + filterable case list
+│   │   │   ├── CaseDetail.jsx # Full case detail + similar cases
+│   │   │   ├── Predict.jsx    # Single + batch prediction UI
+│   │   │   ├── RAG.jsx        # Chat-style RAG query interface
+│   │   │   ├── Analytics.jsx  # Distributions, trends, forecast
+│   │   │   └── ModelReports.jsx # Model comparison + radar charts
+│   │   ├── components/        # Layout, StatCard, Badge, Pagination, …
+│   │   ├── services/api.js    # Axios API client
+│   │   ├── context/           # Auth context
+│   │   ├── hooks/             # React Query hooks
+│   │   └── utils/             # Helpers, color maps
+│   ├── Dockerfile.frontend
+│   └── nginx.conf
+│
+└── output/                    # All pipeline outputs (auto-created)
+    ├── clean_data.csv
+    ├── unknown_case_data.csv
+    ├── models/
+    ├── reports/
+    ├── plots/
+    └── vectorstore/
+```
+---
+Quick Start
+1. Install Python dependencies
+```bash
+python -m venv venv
+source venv/bin/activate      # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+2. Configure environment
+```bash
+cp .env.example .env
+# Edit .env — set LEGAL_DATA_ROOT to your JSON data folder
+```
+3. Run the data science pipeline
+```bash
+python main.py                    # Full pipeline (~4-5 hours on 12k cases)
+python main.py --skip-etl         # Skip ETL, load existing clean_data.csv
+python main.py --etl-only         # ETL only, then exit
+python main.py --no-rag           # Skip RAG vectorstore build
+python main.py --no-shap          # Skip SHAP (faster)
+```
+4. Start the API server
+```bash
+python scripts/run_api.py
+# or directly:
+uvicorn api.app:app --host 0.0.0.0 --port 8000 --reload
+```
+5. Start the frontend
+```bash
+cd frontend
+npm install
+npm run dev                       # Development: http://localhost:3000
+npm run build                     # Production build → frontend/dist/
+```
+6. Open the platform
+Frontend: http://localhost:3000
+API docs: http://localhost:8000/docs
+Login: admin / admin123
+---
+Docker (Full Stack)
+```bash
+docker-compose up --build
+```
+Frontend: http://localhost:3000
+API:      http://localhost:8000
+Database: localhost:5432
+---
+API Endpoints
+Method	Endpoint	Description
+GET	`/api/v1/health`	Health check
+POST	`/api/v1/auth/login`	Get JWT token
+POST	`/api/v1/predict`	Single case prediction
+POST	`/api/v1/predict/batch`	Batch prediction (up to 50)
+POST	`/api/v1/rag/query`	RAG semantic query
+GET	`/api/v1/cases`	List cases (paginated, filtered)
+POST	`/api/v1/cases/search`	Full-text + filtered search
+GET	`/api/v1/cases/{id}`	Case detail
+GET	`/api/v1/cases/{id}/similar`	Semantically similar cases
+GET	`/api/v1/analytics/stats`	Corpus statistics
+GET	`/api/v1/analytics/yearly`	Yearly statistics
+GET	`/api/v1/analytics/forecast`	ARIMA forecast
+GET	`/api/v1/analytics/models`	All model reports
+GET	`/api/v1/analytics/models/{target}`	Single target report
+---
+Database Migrations
+```bash
+# Initialise Alembic (first time)
+alembic init database/migrations
+
+# Run all migrations
+alembic upgrade head
+
+# Seed from CSV
+python scripts/seed_db.py
+
+# Create new migration after model changes
+alembic revision --autogenerate -m "describe change"
+```
+---
+Tests
+```bash
+pytest                                  # All tests
+pytest tests/test_extractors.py -v     # Extractor tests
+pytest tests/test_verdict.py -v        # Verdict extractor tests
+pytest tests/test_classifier.py -v     # ML model tests
+pytest tests/test_rag.py -v            # RAG tests
+pytest tests/test_pipeline.py -v       # Pipeline tests
+```
+---
+Key Results
+Target	Best Model	Accuracy	Macro-F1
+Case Type (5 classes)	XGBoost	84.5%	83.8%
+Sub-Type (21 classes)	XGBoost	76.8%	70.3%
+Verdict (4 classes)	XGBoost	96.4%	96.2%
+Total validated records: 17,987
+Clean labelled records: 11,712
+ARIMA(2,2,1) forecast: AIC = 1,560.38
+RAG vectorstore: 3,487 chunks indexed in FAISS
