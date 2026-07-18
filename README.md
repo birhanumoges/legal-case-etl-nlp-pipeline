@@ -12,6 +12,29 @@ ETL pipeline that converts historical court case HTML/JSON into structured NLP-r
 | **Explainability** | SHAP + TF-IDF feature importance |
 | **API** | FastAPI REST endpoints for prediction + RAG |
 
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1e3c72,100:2a5298&height=200&section=header&text=Legal%20NLP%20Platform&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Court%20Case%20Intelligence%20%E2%80%A2%20Classification%20%E2%80%A2%20RAG%20Search&descAlignY=58&descSize=18" width="100%"/>
+<a href="https://github.com">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&duration=2800&pause=900&color=2A5298&center=true&vCenter=true&width=780&lines=ETL+%E2%86%92+NLP+%E2%86%92+Classification+%E2%86%92+RAG+%E2%86%92+API;17%2C987+court+cases+processed;96.4%25+verdict+prediction+accuracy;FAISS-powered+semantic+case+search" alt="Typing SVG" />
+</a>
+<br/>
+<p>
+  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white"/>
+  <img src="https://img.shields.io/badge/React-Frontend-61DAFB?style=for-the-badge&logo=react&logoColor=black"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
+</p>
+<p>
+  <img src="https://img.shields.io/badge/Accuracy-96.4%25-2ea44f?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Records-17%2C987-blue?style=flat-square"/>
+  <img src="https://img.shields.io/badge/RAG%20Chunks-3%2C487-orange?style=flat-square"/>
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square"/>
+  <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=flat-square"/>
+</p>
+</div>
+<br/>
+
 ## Setup
 
 ```bash
