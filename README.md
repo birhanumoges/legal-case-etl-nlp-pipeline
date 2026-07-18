@@ -114,8 +114,60 @@ graph TD
     style Data fill:#336791,color:#fff
 ```
 
-
+---
+ 
 ## ✨ Features
+ 
+<table>
+<tr>
+<td width="50%" valign="top">
+### 🔧 Data Pipeline
+- **ETL**: JSON → structured DataFrame (verdict, case type, sub-type, citations)
+- **Checkpointing**: resumable pipeline runs
+- **Class mapping**: 5 case types, 5 verdict classes
+- Rule-based extractors, fully tested
+</td>
+<td width="50%" valign="top">
+### 🤖 Machine Learning
+- **3 targets × 3 models**: Logistic Regression, Linear SVM, XGBoost
+- **Imbalance handling**: SMOTE + `class_weight='balanced'`
+- **Explainability**: SHAP + TF-IDF importance
+- Model comparison reports per target
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+### 🔍 Semantic Search (RAG)
+- **FAISS** vectorstore over case text
+- LLM-powered query engine
+- 3,487 indexed chunks
+- `/rag/query` endpoint for natural-language Q&A
+</td>
+<td width="50%" valign="top">
+### 📈 Analytics & Forecasting
+- Yearly trend analysis
+- **ARIMA / Prophet** forecasting
+- Interactive dashboard charts
+- Confusion matrices + radar comparisons
+</td>
+</tr>
+</table>
+<details>
+<summary><b>🖥️ Frontend pages (click to expand)</b></summary>
+<br/>
+| Page | Description |
+|---|---|
+| `Login.jsx` | JWT-based authentication |
+| `Dashboard.jsx` | Overview stats + charts |
+| `Cases.jsx` | Browseable + filterable case list |
+| `CaseDetail.jsx` | Full case detail + similar cases |
+| `Predict.jsx` | Single + batch prediction UI |
+| `RAG.jsx` | Chat-style RAG query interface |
+| `Analytics.jsx` | Distributions, trends, forecast |
+| `ModelReports.jsx` | Model comparison + radar charts |
+ 
+</details>
+
 
 ## 📁 Project Structure
 
