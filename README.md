@@ -76,6 +76,44 @@ flowchart LR
 
 
 ## 🏗️ Architecture
+ 
+```mermaid
+graph TD
+    subgraph Client["🖥️ Frontend — React + Tailwind"]
+        L[Login/JWT]
+        DASH[Dashboard]
+        CASES[Cases Browser]
+        PRED[Predict UI]
+        RAG_UI[RAG Chat]
+        ANA[Analytics]
+    end
+ 
+    subgraph API["⚙️ FastAPI Backend"]
+        AUTH[/auth/login/]
+        PREDICT[/predict, /predict/batch/]
+        RAGQ[/rag/query/]
+        CASEAPI[/cases, /cases/id/]
+        ANALYTICS[/analytics/*/]
+    end
+ 
+    subgraph Data["🗄️ Data Layer"]
+        PG[(PostgreSQL)]
+        FAISS[(FAISS Index)]
+        MODELS[(Joblib Models)]
+    end
+ 
+    Client --> API
+    AUTH --> PG
+    CASEAPI --> PG
+    PREDICT --> MODELS
+    RAGQ --> FAISS
+    ANALYTICS --> PG
+ 
+    style Client fill:#61DAFB,color:#000
+    style API fill:#009688,color:#fff
+    style Data fill:#336791,color:#fff
+```
+
 
 ## ✨ Features
 
