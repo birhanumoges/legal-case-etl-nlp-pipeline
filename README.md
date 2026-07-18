@@ -1,16 +1,3 @@
-# legal-case-etl-nlp-pipeline
-ETL pipeline that converts historical court case HTML/JSON into structured NLP-ready datasets with verdict extraction, legal citation parsing, and case classification for building legal AI assistants.Production-grade, research-quality NLP pipeline for historical legal case analysis.
-
-## Features
-
-| Component | Description |
-|-----------|-------------|
-| **ETL** | JSON → structured DataFrame with verdict, case type, sub-type, citations |
-| **Classification** | 3 targets × 3 models (LR, SVM, XGBoost) with SMOTE + class weighting |
-| **Time Series** | Trend analysis + ARIMA/Prophet forecasting |
-| **RAG** | FAISS vectorstore + LLM query engine |
-| **Explainability** | SHAP + TF-IDF feature importance |
-| **API** | FastAPI REST endpoints for prediction + RAG |
 
 <div align="center">
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:1e3c72,100:2a5298&height=200&section=header&text=Legal%20NLP%20Platform&fontSize=48&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Court%20Case%20Intelligence%20%E2%80%A2%20Classification%20%E2%80%A2%20RAG%20Search&descAlignY=58&descSize=18" width="100%"/>
