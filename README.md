@@ -115,48 +115,74 @@ graph TD
 ```
 
 ---
- 
+
 ## ✨ Features
- 
+
 <table>
 <tr>
 <td width="50%" valign="top">
-### 🔧 Data Pipeline
-- **ETL**: JSON → structured DataFrame (verdict, case type, sub-type, citations)
-- **Checkpointing**: resumable pipeline runs
-- **Class mapping**: 5 case types, 5 verdict classes
-- Rule-based extractors, fully tested
+
+<h3>🔧 Data Pipeline</h3>
+
+<ul>
+<li><strong>ETL</strong>: JSON → structured DataFrame (verdict, case type, sub-type, citations)</li>
+<li><strong>Checkpointing</strong>: resumable pipeline runs</li>
+<li><strong>Class mapping</strong>: 5 case types, 5 verdict classes</li>
+<li>Rule-based extractors, fully tested</li>
+</ul>
+
 </td>
+
 <td width="50%" valign="top">
-### 🤖 Machine Learning
-- **3 targets × 3 models**: Logistic Regression, Linear SVM, XGBoost
-- **Imbalance handling**: SMOTE + `class_weight='balanced'`
-- **Explainability**: SHAP + TF-IDF importance
-- Model comparison reports per target
+
+<h3>🤖 Machine Learning</h3>
+
+<ul>
+<li><strong>3 targets × 3 models</strong>: Logistic Regression, Linear SVM, XGBoost</li>
+<li><strong>Imbalance handling</strong>: SMOTE + <code>class_weight='balanced'</code></li>
+<li><strong>Explainability</strong>: SHAP + TF-IDF importance</li>
+<li>Model comparison reports per target</li>
+</ul>
+
 </td>
 </tr>
+
 <tr>
 <td width="50%" valign="top">
-### 🔍 Semantic Search (RAG)
-- **FAISS** vectorstore over case text
-- LLM-powered query engine
-- 3,487 indexed chunks
-- `/rag/query` endpoint for natural-language Q&A
+
+<h3>🔍 Semantic Search (RAG)</h3>
+
+<ul>
+<li><strong>FAISS</strong> vectorstore over case text</li>
+<li>LLM-powered query engine</li>
+<li>3,487 indexed chunks</li>
+<li><code>/rag/query</code> endpoint for natural-language Q&amp;A</li>
+</ul>
+
 </td>
+
 <td width="50%" valign="top">
-### 📈 Analytics & Forecasting
-- Yearly trend analysis
-- **ARIMA / Prophet** forecasting
-- Interactive dashboard charts
-- Confusion matrices + radar comparisons
+
+<h3>📈 Analytics &amp; Forecasting</h3>
+
+<ul>
+<li>Yearly trend analysis</li>
+<li><strong>ARIMA / Prophet</strong> forecasting</li>
+<li>Interactive dashboard charts</li>
+<li>Confusion matrices + radar comparisons</li>
+</ul>
+
 </td>
 </tr>
 </table>
+
 <details>
 <summary><b>🖥️ Frontend pages (click to expand)</b></summary>
-<br/>
+
+<br>
+
 | Page | Description |
-|---|---|
+|------|-------------|
 | `Login.jsx` | JWT-based authentication |
 | `Dashboard.jsx` | Overview stats + charts |
 | `Cases.jsx` | Browseable + filterable case list |
@@ -165,7 +191,7 @@ graph TD
 | `RAG.jsx` | Chat-style RAG query interface |
 | `Analytics.jsx` | Distributions, trends, forecast |
 | `ModelReports.jsx` | Model comparison + radar charts |
- 
+
 </details>
 
 
