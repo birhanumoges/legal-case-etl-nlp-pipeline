@@ -50,6 +50,30 @@
  
 > Built for teams building **legal AI assistants**, case-outcome research tools, or judicial analytics products.
 
+<div align="center">
+```mermaid
+flowchart LR
+    A["📄 Raw JSON / HTML<br/>Court Cases"] --> B["🔧 ETL Extractors<br/>verdict • citations • type"]
+    B --> C["🧹 Preprocessing<br/>cleaning • encoding • SMOTE"]
+    C --> D["🤖 Classification<br/>LR • SVM • XGBoost"]
+    C --> E["📈 Time Series<br/>ARIMA / Prophet"]
+    C --> F["🔍 Vectorstore<br/>FAISS Embeddings"]
+    D --> G["🧠 Explainability<br/>SHAP / TF-IDF"]
+    F --> H["💬 RAG Query Engine"]
+    D --> I["⚙️ FastAPI Backend"]
+    E --> I
+    H --> I
+    I --> J["🖥️ React Dashboard"]
+ 
+    style A fill:#1e3c72,color:#fff
+    style J fill:#2a5298,color:#fff
+    style I fill:#009688,color:#fff
+    style H fill:#f39c12,color:#fff
+```
+ 
+</div>
+
+
 ## 🏗️ Architecture
 
 ## ✨ Features
