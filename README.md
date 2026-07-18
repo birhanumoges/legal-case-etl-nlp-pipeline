@@ -197,10 +197,11 @@ graph TD
 ---
  
 ## 📁 Project Structure
- 
+
 <details open>
 <summary><b>Click to collapse/expand full tree</b></summary>
-```
+
+```text
 legal_nlp/
 ├── main.py                    # Data science pipeline orchestrator
 ├── config.py                  # All paths, constants, hyperparameters
@@ -229,7 +230,7 @@ legal_nlp/
 │   ├── app.py                 # Entry point — registers all routers
 │   ├── routes.py              # GET /health, POST /predict, POST /rag/query
 │   ├── routes_auth.py         # POST /auth/login
-│   ├── routes_cases.py        # GET/POST /cases  GET /cases/{id}
+│   ├── routes_cases.py        # GET/POST /cases, GET /cases/{id}
 │   ├── routes_analytics.py    # GET /analytics/stats|yearly|forecast|models
 │   ├── routes_predict.py      # POST /predict/batch
 │   ├── schemas.py             # All Pydantic models
@@ -262,7 +263,7 @@ legal_nlp/
     ├── plots/
     └── vectorstore/
 ```
- 
+
 </details>
 
 ---
