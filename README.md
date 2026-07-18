@@ -22,6 +22,24 @@
 </div>
 <br/>
 
+## 📚 Table of Contents
+ 
+<div align="center">
+| [🚀 Overview](#-overview) | [🏗️ Architecture](#️-architecture) | [✨ Features](#-features) | [📁 Structure](#-project-structure) |
+|:---:|:---:|:---:|:---:|
+| [⚡ Quick Start](#-quick-start) | [🔌 API Reference](#-api-reference) | [📊 Results](#-key-results) | [🐳 Docker](#-docker-full-stack) |
+| [🧪 Testing](#-testing) | [🗄️ Migrations](#️-database-migrations) | [🤝 Contributing](#-contributing) | [📄 License](#-license) |
+ 
+</div>
+---
+ 
+## 🚀 Overview
+ 
+**Legal NLP Platform** is a production-grade, end-to-end system that turns raw historical court case data (HTML/JSON) into a fully queryable legal intelligence platform — combining rule-based ETL, multi-model classification, time-series forecasting, and retrieval-augmented generation (RAG), all served through a FastAPI backend and a React dashboard.
+ 
+> Built for teams building **legal AI assistants**, case-outcome research tools, or judicial analytics products.
+
+
 ## Setup
 
 ```bash
