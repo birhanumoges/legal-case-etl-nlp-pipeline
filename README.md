@@ -194,8 +194,78 @@ graph TD
 
 </details>
 
-
+---
+ 
 ## 📁 Project Structure
+ 
+<details open>
+<summary><b>Click to collapse/expand full tree</b></summary>
+```
+legal_nlp/
+├── main.py                    # Data science pipeline orchestrator
+├── config.py                  # All paths, constants, hyperparameters
+├── requirements.txt
+├── alembic.ini                # Database migration config
+├── docker-compose.yml         # Full-stack Docker orchestration
+├── Dockerfile.api             # Backend Docker image
+├── .env.example               # Environment variable template
+│
+├── extractors/                # Rule-based ETL extractors
+├── preprocessing/             # Feature encoding, cleaning, splitting
+├── modeling/                  # LR / SVM / XGBoost classifiers
+├── pipeline/                  # ETL orchestration + checkpoints
+├── evaluation/                # Metrics, class balance, RAG eval
+├── visualization/             # EDA, confusion matrix, SHAP plots
+├── time_series/               # ARIMA forecasting + trend analysis
+├── explainability/            # Feature importance + SHAP
+├── rag/                       # Retrieval-Augmented Generation
+├── vectorstore/               # FAISS index + embeddings
+├── database/                  # SQLAlchemy ORM + migrations
+├── utils/                     # Logger, text helpers
+├── tests/                     # pytest test suite
+├── notebooks/                 # Jupyter analysis notebooks
+│
+├── api/
+│   ├── app.py                 # Entry point — registers all routers
+│   ├── routes.py              # GET /health, POST /predict, POST /rag/query
+│   ├── routes_auth.py         # POST /auth/login
+│   ├── routes_cases.py        # GET/POST /cases  GET /cases/{id}
+│   ├── routes_analytics.py    # GET /analytics/stats|yearly|forecast|models
+│   ├── routes_predict.py      # POST /predict/batch
+│   ├── schemas.py             # All Pydantic models
+│   └── dependencies.py        # JWT auth, pagination
+│
+├── scripts/
+│   ├── run_api.py             # Start API server
+│   ├── seed_db.py             # Load clean_data.csv → PostgreSQL
+│   ├── build_vectorstore.py   # Build FAISS index
+│   ├── export_reports.py      # Export all outputs to ZIP
+│   └── check_health.py        # Verify pipeline + API health
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── pages/
+│   │   ├── components/
+│   │   ├── services/api.js
+│   │   ├── context/
+│   │   ├── hooks/
+│   │   └── utils/
+│   ├── Dockerfile.frontend
+│   └── nginx.conf
+│
+└── output/                    # All pipeline outputs (auto-created)
+    ├── clean_data.csv
+    ├── unknown_case_data.csv
+    ├── models/
+    ├── reports/
+    ├── plots/
+    └── vectorstore/
+```
+ 
+</details>
+
+---
 
 ## ⚡ Quick Start
 
