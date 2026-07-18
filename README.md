@@ -25,14 +25,48 @@
 
 
 ## 📚 Table of Contents
- 
+
 <div align="center">
-| [🚀 Overview](#-overview) | [🏗️ Architecture](#️-architecture) | [✨ Features](#-features) | [📁 Structure](#-project-structure) |
+
+| 🚀 Overview | 🏗️ Architecture | ✨ Features | 📁 Structure |
 |:---:|:---:|:---:|:---:|
-| [⚡ Quick Start](#-quick-start) | [🔌 API Reference](#-api-reference) | [📊 Results](#-key-results) | [🐳 Docker](#-docker-full-stack) |
-| [🧪 Testing](#-testing) | [🗄️ Migrations](#️-database-migrations) | [🤝 Contributing](#-contributing) | [📄 License](#-license) |
- 
+| [Overview](#overview) | [Architecture](#architecture) | [Features](#features) | [Structure](#project-structure) |
+
+| ⚡ Quick Start | 🔌 API Reference | 📊 Results | 🐳 Docker |
+|:---:|:---:|:---:|:---:|
+| [Quick Start](#quick-start) | [API Reference](#api-reference) | [Results](#key-results) | [Docker](#docker-full-stack) |
+
+| 🧪 Testing | 🗄️ Migrations | 🤝 Contributing | 📄 License |
+|:---:|:---:|:---:|:---:|
+| [Testing](#testing) | [Migrations](#database-migrations) | [Contributing](#contributing) | [License](#license) |
+
 </div>
+
+---
+
+## 🚀 Overview
+
+## 🏗️ Architecture
+
+## ✨ Features
+
+## 📁 Project Structure
+
+## ⚡ Quick Start
+
+## 🔌 API Reference
+
+## 📊 Key Results
+
+## 🐳 Docker Full Stack
+
+## 🧪 Testing
+
+## 🗄️ Database Migrations
+
+## 🤝 Contributing
+
+## 📄 License
 
 ---
  
