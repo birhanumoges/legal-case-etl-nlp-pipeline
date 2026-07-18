@@ -51,7 +51,6 @@
 > Built for teams building **legal AI assistants**, case-outcome research tools, or judicial analytics products.
 
 <div align="center">
-```mermaid
 flowchart LR
     A["📄 Raw JSON / HTML<br/>Court Cases"] --> B["🔧 ETL Extractors<br/>verdict • citations • type"]
     B --> C["🧹 Preprocessing<br/>cleaning • encoding • SMOTE"]
@@ -69,8 +68,6 @@ flowchart LR
     style J fill:#2a5298,color:#fff
     style I fill:#009688,color:#fff
     style H fill:#f39c12,color:#fff
-```
- 
 </div>
 
 
