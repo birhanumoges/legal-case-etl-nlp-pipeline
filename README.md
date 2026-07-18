@@ -20,7 +20,9 @@
   <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=flat-square"/>
 </p>
 </div>
+
 <br/>
+
 
 ## 📚 Table of Contents
  
@@ -31,6 +33,7 @@
 | [🧪 Testing](#-testing) | [🗄️ Migrations](#️-database-migrations) | [🤝 Contributing](#-contributing) | [📄 License](#-license) |
  
 </div>
+
 ---
  
 ## 🚀 Overview
