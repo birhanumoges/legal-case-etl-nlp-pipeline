@@ -269,61 +269,87 @@ legal_nlp/
 ---
 
 ## ⚡ Quick Start
- 
+
 ### 1️⃣ Install Python dependencies
- 
+
 ```bash
 python -m venv venv
 source venv/bin/activate      # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
- 
+
 ### 2️⃣ Configure environment
- 
+
 ```bash
 cp .env.example .env
 # Edit .env — set LEGAL_DATA_ROOT to your JSON data folder
 ```
- 
+
 ### 3️⃣ Run the data science pipeline
- 
+
 <table>
-<tr><th>Command</th><th>What it does</th></tr>
-<tr><td><code>python main.py</code></td><td>Full pipeline (ETL → EDA → Models → SHAP → Time Series → RAG), ~4–5h on 12k cases</td></tr>
-<tr><td><code>python main.py --skip-etl</code></td><td>Skip ETL, load existing <code>clean_data.csv</code></td></tr>
-<tr><td><code>python main.py --etl-only</code></td><td>Run ETL only, then exit</td></tr>
-<tr><td><code>python main.py --no-rag</code></td><td>Skip RAG vectorstore build</td></tr>
-<tr><td><code>python main.py --no-shap</code></td><td>Skip SHAP (much faster)</td></tr>
-<tr><td><code>python main.py --force-etl</code></td><td>Force re-run ETL, ignoring checkpoint</td></tr>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+
+<tr>
+<td><code>python main.py</code></td>
+<td>Full pipeline (ETL → EDA → Models → SHAP → Time Series → RAG), ~4–5h on 12k cases</td>
+</tr>
+
+<tr>
+<td><code>python main.py --skip-etl</code></td>
+<td>Skip ETL, load existing <code>clean_data.csv</code></td>
+</tr>
+
+<tr>
+<td><code>python main.py --etl-only</code></td>
+<td>Run ETL only, then exit</td>
+</tr>
+
+<tr>
+<td><code>python main.py --no-rag</code></td>
+<td>Skip RAG vectorstore build</td>
+</tr>
+
+<tr>
+<td><code>python main.py --no-shap</code></td>
+<td>Skip SHAP (much faster)</td>
+</tr>
+
+<tr>
+<td><code>python main.py --force-etl</code></td>
+<td>Force re-run ETL, ignoring checkpoint</td>
+</tr>
 </table>
+
 ### 4️⃣ Start the API server
- 
+
 ```bash
 python scripts/run_api.py
+
 # or directly:
 uvicorn api.app:app --host 0.0.0.0 --port 8000 --reload
 ```
- 
+
 ### 5️⃣ Start the frontend
- 
+
 ```bash
 cd frontend
 npm install
-npm run dev        # Development → http://localhost:3000
+npm run dev         # Development → http://localhost:3000
 npm run build       # Production build → frontend/dist/
 ```
- 
+
 ### 6️⃣ Open the platform
- 
-<div align="center">
+
 | Service | URL | Credentials |
-|---|---|---|
+|----------|-----|-------------|
 | 🖥️ Frontend | `http://localhost:3000` | — |
 | 📘 API Docs | `http://localhost:8000/docs` | — |
-| 🔐 Login | — | `admin` / `admin123` |
- 
-</div>
+
 ---
 
 ## 🔌 API Reference
