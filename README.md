@@ -400,19 +400,16 @@ curl -X POST http://localhost:8000/api/v1/rag/query \
 ---
 
 ## 🐳 Docker (Full Stack)
- 
+
 ```bash
 docker-compose up --build
 ```
- 
-<div align="center">
-| Service | URL |
-|---|---|
-| Frontend | `http://localhost:3000` |
-| API | `http://localhost:8000` |
-| Database | `localhost:5432` |
- 
-</div>
+
+| Service | Endpoint |
+|----------|----------|
+| 🖥️ Frontend | `http://localhost:3000` |
+| ⚙️ API | `http://localhost:8000` |
+| 🗄️ PostgreSQL | `localhost:5432` |
 
 ---
 
