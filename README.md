@@ -23,24 +23,21 @@
 
 <br/>
 
+---
 
 ## 📚 Table of Contents
 
-<div align="center">
-
-| 🚀 Overview | 🏗️ Architecture | ✨ Features | 📁 Structure |
+| 🚀 Overview | 🏗️ Architecture | ✨ Features | 📁 Project Structure |
 |:---:|:---:|:---:|:---:|
-| [Overview](#overview) | [Architecture](#architecture) | [Features](#features) | [Structure](#project-structure) |
+| [Overview](#-overview) | [Architecture](#️-architecture) | [Features](#-features) | [Project Structure](#-project-structure) |
 
-| ⚡ Quick Start | 🔌 API Reference | 📊 Results | 🐳 Docker |
+| ⚡ Quick Start | 🔌 API Reference | 📊 Key Results | 🐳 Docker (Full Stack) |
 |:---:|:---:|:---:|:---:|
-| [Quick Start](#quick-start) | [API Reference](#api-reference) | [Results](#key-results) | [Docker](#docker-full-stack) |
+| [Quick Start](#-quick-start) | [API Reference](#-api-reference) | [Key Results](#-key-results) | [Docker](#-docker-full-stack) |
 
-| 🧪 Testing | 🗄️ Migrations | 🤝 Contributing | 📄 License |
+| 🧪 Testing | 🗄️ Database Migrations | 🤝 Contributing | 📄 License |
 |:---:|:---:|:---:|:---:|
-| [Testing](#testing) | [Migrations](#database-migrations) | [Contributing](#contributing) | [License](#license) |
-
-</div>
+| [Testing](#-testing) | [Database Migrations](#️-database-migrations) | [Contributing](#-contributing) | [License](#-license) |
 
 ---
 
