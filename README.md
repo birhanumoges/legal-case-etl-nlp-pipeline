@@ -430,9 +430,79 @@ pytest tests/test_pipeline.py -v        # Full pipeline tests
  
 ---
 
----
-
 ## 📊 Key Results
+
+| Target | Best Model | Accuracy | Macro-F1 |
+|:---|:---:|:---:|:---:|
+| **Case Type** (5 classes) | XGBoost | ![](https://progress-bar.dev/85/?scale=100&width=100&color=2a5298) 84.5% | 83.8% |
+| **Sub-Type** (21 classes) | XGBoost | ![](https://progress-bar.dev/77/?scale=100&width=100&color=f39c12) 76.8% | 70.3% |
+| **Verdict** (4 classes) | XGBoost | ![](https://progress-bar.dev/96/?scale=100&width=100&color=2ea44f) 96.4% | 96.2% |
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Total%20Records-17%2C987-1e3c72?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Clean%20Labelled-11%2C712-2a5298?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/ARIMA(2,2,1)%20AIC-1560.38-f39c12?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/FAISS%20Chunks-3%2C487-2ea44f?style=for-the-badge"/>
+</p>
+
+### Class Mappings
+
+<table>
+<tr>
+<td valign="top">
+
+<h4>Case Type (5)</h4>
+
+```text
+CIVIL
+CRIMINAL
+CONTRACT
+PROPERTY
+TORTS
+```
+
+</td>
+
+<td valign="top">
+
+<h4>Verdict (5)</h4>
+
+```text
+AFFIRMED
+REVERSED
+DENIED
+GRANTED
+OTHER
+```
+
+</td>
+</tr>
+</table>
+
+### Pipeline Outputs
+
+<details>
+<summary><b>All files written to <code>output/</code></b></summary>
+
+| File / Folder | Contents |
+|---|---|
+| `clean_data.csv` | Cleaned + mapped data used for modeling |
+| `unknown_case_data.csv` | Unclassified / verdict-unknown rows |
+| `full_data.csv` | All extracted rows (raw) |
+| `reports/*.json` | Per-target model reports (accuracy, F1, confusion matrix) |
+| `reports/*_model_comparison.csv` | All 3 models compared per target |
+| `reports/*_actual_vs_predicted_*.csv` | Full prediction output with all columns |
+| `reports/ts_*.csv` | Time-series trend tables |
+| `plots/eda_*.png` | EDA distribution charts |
+| `plots/cm_*.png` | Confusion matrices (raw + normalized) |
+| `plots/shap_*.png` | SHAP feature importance charts |
+| `plots/ts_*.png` | Time-series + forecast plots |
+| `models/*.joblib` | Saved best models + feature encoder |
+| `vectorstore/` | FAISS index + embeddings |
+
+</details>
+
+---
 
 ## 🐳 Docker Full Stack
 
