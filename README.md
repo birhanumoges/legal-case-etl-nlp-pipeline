@@ -354,6 +354,51 @@ npm run build       # Production build → frontend/dist/
 
 ## 🔌 API Reference
 
+<details open>
+<summary><b>Full endpoint list</b></summary>
+
+| Method | Endpoint | Description |
+|:---:|---|---|
+| `GET` | `/api/v1/health` | Health check |
+| `POST` | `/api/v1/auth/login` | Get JWT token |
+| `POST` | `/api/v1/predict` | Single case prediction |
+| `POST` | `/api/v1/predict/batch` | Batch prediction (up to 50) |
+| `POST` | `/api/v1/rag/query` | RAG semantic query |
+| `GET` | `/api/v1/cases` | List cases (paginated, filtered) |
+| `POST` | `/api/v1/cases/search` | Full-text + filtered search |
+| `GET` | `/api/v1/cases/{id}` | Case detail |
+| `GET` | `/api/v1/cases/{id}/similar` | Semantically similar cases |
+| `GET` | `/api/v1/analytics/stats` | Corpus statistics |
+| `GET` | `/api/v1/analytics/yearly` | Yearly statistics |
+| `GET` | `/api/v1/analytics/forecast` | ARIMA forecast |
+| `GET` | `/api/v1/analytics/models` | All model reports |
+| `GET` | `/api/v1/analytics/models/{target}` | Single target report |
+
+</details>
+
+<details>
+<summary><b>💡 Example requests</b></summary>
+
+**Predict a case:**
+
+```bash
+curl -X POST http://localhost:8000/api/v1/predict \
+  -H "Content-Type: application/json" \
+  -d '{"case_text": "The plaintiff filed for breach of contract...", "court": "Superior Court", "num_citations": 3}'
+```
+
+**RAG semantic query:**
+
+```bash
+curl -X POST http://localhost:8000/api/v1/rag/query \
+  -H "Content-Type: application/json" \
+  -d '{"question": "What was the outcome of contract cases?", "top_k": 5}'
+```
+
+</details>
+
+---
+
 ## 📊 Key Results
 
 ## 🐳 Docker Full Stack
