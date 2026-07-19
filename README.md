@@ -397,6 +397,39 @@ curl -X POST http://localhost:8000/api/v1/rag/query \
 
 </details>
 
+## 🗄️ Database Migrations
+ 
+```bash
+# Initialise Alembic (first time)
+alembic init database/migrations
+ 
+# Run all migrations
+alembic upgrade head
+ 
+# Seed from CSV
+python scripts/seed_db.py
+ 
+# Create new migration after model changes
+alembic revision --autogenerate -m "describe change"
+```
+ 
+---
+ 
+## 🧪 Testing
+ 
+```bash
+pytest                                  # All tests
+pytest tests/test_extractors.py -v      # Extractor tests
+pytest tests/test_verdict.py -v         # Verdict extractor tests
+pytest tests/test_classifier.py -v      # ML model tests
+pytest tests/test_rag.py -v             # RAG tests
+pytest tests/test_vectorstore.py -v     # Vectorstore tests
+pytest tests/test_time_series.py -v     # Time-series tests
+pytest tests/test_pipeline.py -v        # Full pipeline tests
+```
+ 
+---
+
 ---
 
 ## 📊 Key Results
