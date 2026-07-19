@@ -397,6 +397,25 @@ curl -X POST http://localhost:8000/api/v1/rag/query \
 
 </details>
 
+---
+
+## 🐳 Docker (Full Stack)
+ 
+```bash
+docker-compose up --build
+```
+ 
+<div align="center">
+| Service | URL |
+|---|---|
+| Frontend | `http://localhost:3000` |
+| API | `http://localhost:8000` |
+| Database | `localhost:5432` |
+ 
+</div>
+
+---
+
 ## 🗄️ Database Migrations
  
 ```bash
@@ -503,14 +522,18 @@ OTHER
 </details>
 
 ---
-
-## 🐳 Docker Full Stack
-
-## 🧪 Testing
-
-## 🗄️ Database Migrations
-
+ 
 ## 🤝 Contributing
+ 
+Contributions are welcome! Please open an issue first to discuss what you'd like to change.
+ 
+```bash
+git checkout -b feature/your-feature
+git commit -m "Add your feature"
+git push origin feature/your-feature
+```
+ 
+Then open a Pull Request 🚀
 
 ## 📄 License
 
